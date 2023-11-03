@@ -30,6 +30,7 @@ public class User {
 	private String comments;
 	private String mail;
 
+
 	public long getId() {
 		return id;
 	}

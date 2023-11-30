@@ -32,6 +32,7 @@ public class DbConfig {
 		dataSource.setUrl(env.getProperty("url"));
 		dataSource.setUsername(env.getProperty("user"));
 		dataSource.setPassword(env.getProperty("password"));
+		
 		return dataSource;
 	}
 

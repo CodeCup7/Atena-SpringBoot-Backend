@@ -4,19 +4,43 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
-public class RatePart {
+public class RatePart{
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;	
 	private String key;
 	private long ocena;
 	private long waga;
 	private String nieprawidlowosci;
 	private String opis;
 	private String uwagi;
+	
+	@ManyToOne
+	@JoinColumn(name="rate_id")
+    private RateCC rate;
+	
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public RateCC getRate() {
+		return rate;
+	}
+
+	public void setRate(RateCC rate) {
+		this.rate = rate;
+	}
 
 	public String getKey() {
 		return key;
@@ -65,5 +89,6 @@ public class RatePart {
 	public void setUwagi(String uwagi) {
 		this.uwagi = uwagi;
 	}
+
 
 }

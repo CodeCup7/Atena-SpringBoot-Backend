@@ -1,71 +1,70 @@
 package server.atena.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import server.atena.app.TypeRateCC;
 
 @Entity
 public class RateCC {
 
-	private TypeRateCC typeRateCC;
-	private long mode;
+	@Enumerated(EnumType.STRING)
+	private TypeRateCC typeRate;
 
 	private long id_note;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private double rate;
-	@OneToOne
-	@JoinColumn(name = "agent_id") // Tworzy kolumnę "agent_id" w tabeli do przechowywania klucza obcego
+	@ManyToOne
+	@JoinColumn(name = "agent_id")
+	@JsonProperty("agent")
 	private User agent;
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "coach_id")
+	@JsonProperty("coach")
 	private User coach;
 	private String dateRate;
 	private String dateCall;
 	private String dateShare;
 	private String idCall;
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "queue_id")
-	private Queue queueId;
+	@JsonProperty("queue")
+	private Queue queue;
 	private String topic;
 	private long extraScore;
 	private String extraScoreTxt;
-	private String ratePartJSON;
-	@OneToOne
-	@JoinColumn(name = "wiedzaBlock_Id")
-	private RateBlock wiedzaBlock_Id;
-	@OneToOne
-	@JoinColumn(name = "obslugaBlock_Id")
-	private RateBlock obslugaBlock_Id;
-	@OneToOne
-	@JoinColumn(name = "technikaBlock_Id")
-	private RateBlock technikaBlock_Id;
-	@OneToOne
-	@JoinColumn(name = "komunikacjaBlock_Id")
-	private RateBlock komunikacjaBlock_Id;
-	@OneToOne
-	@JoinColumn(name = "standardBlock_Id")
-	private RateBlock standardBlock_Id;
 
-	public TypeRateCC getTypeRateCC() {
-		return typeRateCC;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "rate", orphanRemoval = true)
+	private List<RatePart> ratePart;
+
+	public List<RatePart> getRatePart() {
+		return ratePart;
 	}
 
-	public void setTypeRateCC(TypeRateCC typeRateCC) {
-		this.typeRateCC = typeRateCC;
+	public void setRatePart(List<RatePart> ratePart) {
+		this.ratePart = ratePart;
 	}
 
-	public long getMode() {
-		return mode;
+	public TypeRateCC getTypeRate() {
+		return typeRate;
 	}
 
-	public void setMode(long mode) {
-		this.mode = mode;
+	public void setTypeRate(TypeRateCC typeRate) {
+		this.typeRate = typeRate;
 	}
 
 	public long getId_note() {
@@ -92,20 +91,20 @@ public class RateCC {
 		this.rate = rate;
 	}
 
-	public long getAgentId() {
-		return agentId;
+	public User getAgent() {
+		return agent;
 	}
 
-	public void setAgentId(long agentId) {
-		this.agentId = agentId;
+	public void setAgent(User agent) {
+		this.agent = agent;
 	}
 
-	public long getCoachId() {
-		return coachId;
+	public User getCoach() {
+		return coach;
 	}
 
-	public void setCoachId(long coachId) {
-		this.coachId = coachId;
+	public void setCoach(User coach) {
+		this.coach = coach;
 	}
 
 	public String getDateRate() {
@@ -140,12 +139,12 @@ public class RateCC {
 		this.idCall = idCall;
 	}
 
-	public long getQueueId() {
-		return queueId;
+	public Queue getQueue() {
+		return queue;
 	}
 
-	public void setQueueId(long queueId) {
-		this.queueId = queueId;
+	public void setQueue(Queue queue) {
+		this.queue = queue;
 	}
 
 	public String getTopic() {
@@ -170,54 +169,6 @@ public class RateCC {
 
 	public void setExtraScoreTxt(String extraScoreTxt) {
 		this.extraScoreTxt = extraScoreTxt;
-	}
-
-	public String getRatePartJSON() {
-		return ratePartJSON;
-	}
-
-	public void setRatePartJSON(String ratePartJSON) {
-		this.ratePartJSON = ratePartJSON;
-	}
-
-	public long getWiedzaBlockId() {
-		return wiedzaBlockId;
-	}
-
-	public void setWiedzaBlockId(long wiedzaBlockId) {
-		this.wiedzaBlockId = wiedzaBlockId;
-	}
-
-	public long getObslugaBlockId() {
-		return obslugaBlockId;
-	}
-
-	public void setObslugaBlockId(long obslugaBlockId) {
-		this.obslugaBlockId = obslugaBlockId;
-	}
-
-	public long getTechnikaBlockId() {
-		return technikaBlockId;
-	}
-
-	public void setTechnikaBlockId(long technikaBlockId) {
-		this.technikaBlockId = technikaBlockId;
-	}
-
-	public long getKomunikacjaBlockId() {
-		return komunikacjaBlockId;
-	}
-
-	public void setKomunikacjaBlockId(long komunikacjaBlockId) {
-		this.komunikacjaBlockId = komunikacjaBlockId;
-	}
-
-	public long getStandardBlockId() {
-		return standardBlockId;
-	}
-
-	public void setStandardBlockId(long standardBlockId) {
-		this.standardBlockId = standardBlockId;
 	}
 
 }

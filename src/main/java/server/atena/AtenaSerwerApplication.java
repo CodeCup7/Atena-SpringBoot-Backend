@@ -20,11 +20,5 @@ public class AtenaSerwerApplication {
 		
 	}
 	
-    @GetMapping("/hello")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-    	System.out.println(name);
-      return String.format("Hello %s!", name);
-    }
 
 }

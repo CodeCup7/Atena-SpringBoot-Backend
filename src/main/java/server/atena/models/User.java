@@ -1,16 +1,15 @@
 package server.atena.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import server.atena.app.Role;
 
 @Entity
 public class User {
-
-	enum Role {
-		ADMIN_, AGENT_, COACH_, BOSS_, LEADER_, SUPERVISOR_
-	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +18,7 @@ public class User {
 	// Wspólne
 	private String login;
 	private String nameUser;
+	@Enumerated(EnumType.STRING)
 	private Role role;
 	private boolean available;
 
@@ -55,13 +55,6 @@ public class User {
 		this.nameUser = nameUser;
 	}
 
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(Role role) {
-		this.role = role;
-	}
 
 	public boolean isAvailable() {
 		return available;
@@ -117,6 +110,14 @@ public class User {
 
 	public void setMail(String mail) {
 		this.mail = mail;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 }

@@ -2,8 +2,6 @@ package server.atena.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import server.atena.models.Queue;
 import server.atena.models.User;
 import server.atena.repositories.UserRepository;
 
@@ -20,5 +18,17 @@ public class UserService {
     
     public void add(User e) {
         repository.save(e);
+    }
+    
+    public User getUserById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+    
+    public User getUserByLogin(String login) {
+        return repository.findByLogin(login);
+    }
+    
+    public Iterable<User> getAllUsers() {
+        return repository.findAll();
     }
 }

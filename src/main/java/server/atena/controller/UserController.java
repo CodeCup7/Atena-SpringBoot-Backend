@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,4 +65,23 @@ public class UserController {
         }
        
     }
+    
+    @GetMapping("/getUserId/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    	User user = service.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+    
+    @GetMapping("/getUserLogin/{login}")
+    public ResponseEntity<User> getUserLogin(@PathVariable String login) {
+    	User user = service.getUserByLogin(login);
+        return ResponseEntity.ok(user);
+    }
+    
+    @GetMapping("/getUserAll")
+    public ResponseEntity<Iterable<User>> getAllUsers() {
+        Iterable<User> users = service.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+    
 }

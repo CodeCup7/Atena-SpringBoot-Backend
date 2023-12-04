@@ -2,8 +2,6 @@ package server.atena.app;
 
 public enum Role {
 	
-
-		ADMIN_, AGENT_, COACH_, BOSS_, LEADER_, SUPERVISOR_
+	Admin, Agent, Trener, Kierownik, Lider, Superwajzor
 	
-
 }

@@ -40,13 +40,25 @@ public class UserController {
         User user = null;
         try {
         	user = objectMapper.readValue(json_rateCC, User.class);
-            // Tutaj możesz przetwarzać obiekt RateCC
         } catch (IOException e) {
             e.printStackTrace();
-            // Obsłuż błąd deserializacji JSON
         }
         System.out.println(user);
     	service.add(user);
+       
+    }
+    
+    @PostMapping("/update") // Zmieniamy na POST, bo to jest operacja zapisu
+    public void update(@RequestBody String json_rateCC) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = null;
+        try {
+        	user = objectMapper.readValue(json_rateCC, User.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(user);
+    	service.update(user);
        
     }
     

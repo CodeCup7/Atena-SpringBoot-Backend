@@ -31,4 +31,8 @@ public class UserService {
     public Iterable<User> getAllUsers() {
         return repository.findAll();
     }
+    
+    public void update(User e) {
+        repository.save(e);
+    }
 }

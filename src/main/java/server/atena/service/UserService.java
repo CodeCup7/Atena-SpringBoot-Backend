@@ -20,6 +20,10 @@ public class UserService {
         repository.save(e);
     }
     
+    public void delete(Long e) {
+        repository.deleteById(e);
+    }
+    
     public User getUserById(Long id) {
         return repository.findById(id).orElse(null);
     }

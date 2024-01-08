@@ -26,7 +26,7 @@ public class RateCCController {
         this.service = service;
     }
     
-    @PostMapping("/add") // Zmieniamy na POST, bo to jest operacja zapisu
+    @PostMapping("/add") 
     public void add(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();

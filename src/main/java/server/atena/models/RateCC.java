@@ -1,6 +1,5 @@
 package server.atena.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,7 +18,11 @@ import server.atena.app.TypeRateCC;
 
 @Entity
 public class RateCC {
-
+	
+	@ManyToOne
+	@JoinColumn(name="note_id")
+    private NoteCC note;
+	
 	@Enumerated(EnumType.STRING)
 	private TypeRateCC typeRate;
 
@@ -170,5 +173,15 @@ public class RateCC {
 	public void setExtraScoreTxt(String extraScoreTxt) {
 		this.extraScoreTxt = extraScoreTxt;
 	}
+
+	public NoteCC getNote() {
+		return note;
+	}
+
+	public void setNote(NoteCC note) {
+		this.note = note;
+	}
+	
+	
 
 }

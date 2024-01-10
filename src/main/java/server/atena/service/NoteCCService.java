@@ -24,11 +24,18 @@ public class NoteCCService {
     }
     
     public NoteCC getById(Long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElse(null);	
     }
 
     public List<NoteCC> getAllNotes() {
         Iterable<NoteCC> iterable = repository.findAll();
+        List<NoteCC> NoteList = new ArrayList<>();
+        iterable.forEach(NoteList::add);
+        return NoteList;
+    }
+    
+    public List<NoteCC> getAllNoteDates(String startDate, String endDate) {
+        Iterable<NoteCC> iterable = repository.getAllNoteDates(startDate, endDate);
         List<NoteCC> NoteList = new ArrayList<>();
         iterable.forEach(NoteList::add);
         return NoteList;

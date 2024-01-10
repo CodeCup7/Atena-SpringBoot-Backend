@@ -1,6 +1,5 @@
 package server.atena.controller;
 
-
 import java.io.IOException;
 import java.util.List;
 
@@ -22,82 +21,83 @@ import server.atena.models.User;
 import server.atena.service.UserService;
 
 @RestController
-@RequestMapping("/api/user") // Dostosuj ścieżkę URL do swoich potrzeb
+@RequestMapping("/api/user")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
-    private final UserService service;
+	private final UserService service;
 
-    @Autowired
-    public UserController(UserService service) {
-        this.service = service;
-    }
+	@Autowired
+	public UserController(UserService service) {
+		this.service = service;
+	}
 
-    @PostMapping("/add") // Zmieniamy na POST, bo to jest operacja zapisu
-    public void add(@RequestBody String json_rateCC) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = null;
-        try {
-        	user = objectMapper.readValue(json_rateCC, User.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(user);
-    	service.add(user);
-       
-    }
-    
-    @PostMapping("/update") // Zmieniamy na POST, bo to jest operacja zapisu
-    public void update(@RequestBody String json_rateCC) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = null;
-        try {
-        	user = objectMapper.readValue(json_rateCC, User.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(user);
-    	service.update(user);
-       
-    }
-    
-    @PostMapping("/addList") // Zmieniamy na POST, bo to jest operacja zapisu
-    public void addList(@RequestBody String json_rateCC) {
-    	ObjectMapper objectMapper = new ObjectMapper();
+	@PostMapping("/add")
+	public void add(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		User user = null;
+		try {
+			user = objectMapper.readValue(json_rateCC, User.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(user);
+		service.add(user);
 
-        try {
-            List<User> myObjectList = objectMapper.readValue(json_rateCC, new TypeReference<List<User>>() {});
+	}
 
-            for (User user : myObjectList) {
-                service.add(user);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-       
-    }
-    
-    @GetMapping("/getUserId/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-    	User user = service.getUserById(id);
-        return ResponseEntity.ok(user);
-    }
-    
-    @GetMapping("/getUserLogin/{login}")
-    public ResponseEntity<User> getUserLogin(@PathVariable String login) {
-    	User user = service.getUserByLogin(login);
-        return ResponseEntity.ok(user);
-    }
-    
-    @GetMapping("/getUserAll")
-    public ResponseEntity<Iterable<User>> getAllUsers() {
-        Iterable<User> users = service.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
-    
-    @DeleteMapping("/delete/{id}")
-    public void deleteById(@PathVariable Long id) {
-    	service.delete(id);
-    }
-    
+	@PostMapping("/update")
+	public void update(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		User user = null;
+		try {
+			user = objectMapper.readValue(json_rateCC, User.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(user);
+		service.update(user);
+
+	}
+
+	@PostMapping("/addList")
+	public void addList(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			List<User> myObjectList = objectMapper.readValue(json_rateCC, new TypeReference<List<User>>() {
+			});
+
+			for (User user : myObjectList) {
+				service.add(user);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@GetMapping("/getUserId/{id}")
+	public ResponseEntity<User> getUserById(@PathVariable Long id) {
+		User user = service.getUserById(id);
+		return ResponseEntity.ok(user);
+	}
+
+	@GetMapping("/getUserLogin/{login}")
+	public ResponseEntity<User> getUserLogin(@PathVariable String login) {
+		User user = service.getUserByLogin(login);
+		return ResponseEntity.ok(user);
+	}
+
+	@GetMapping("/getUserAll")
+	public ResponseEntity<Iterable<User>> getAllUsers() {
+		Iterable<User> users = service.getAllUsers();
+		return ResponseEntity.ok(users);
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public void deleteById(@PathVariable Long id) {
+		service.delete(id);
+	}
+
 }

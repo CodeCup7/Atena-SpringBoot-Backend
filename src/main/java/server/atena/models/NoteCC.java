@@ -32,10 +32,11 @@ public class NoteCC {
 	private String coachDate;
 	private String appliesDate;
 	private String zalecenia;
-	private String odwoladnie;
+	private String odwolanie;
+	private String mode;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "note", orphanRemoval = true)
-	private List<RateCC> rateCC_list;
+	private List<RateCC> rateCC_Col;
 
 	public long getId() {
 		return id;
@@ -85,28 +86,36 @@ public class NoteCC {
 		this.zalecenia = zalecenia;
 	}
 
-	public String getOdwoladnie() {
-		return odwoladnie;
-	}
-
-	public void setOdwoladnie(String odwoladnie) {
-		this.odwoladnie = odwoladnie;
-	}
-
-	public List<RateCC> getRateCC_list() {
-		return rateCC_list;
-	}
-
-	public void setRateCC_list(List<RateCC> rateCC_list) {
-		this.rateCC_list = rateCC_list;
-	}
-
 	public StatusNote getStatus() {
 		return status;
 	}
 
 	public void setStatus(StatusNote status) {
 		this.status = status;
+	}
+
+	public String getOdwolanie() {
+		return odwolanie;
+	}
+
+	public void setOdwolanie(String odwolanie) {
+		this.odwolanie = odwolanie;
+	}
+
+	public List<RateCC> getRateCC_Col() {
+		return rateCC_Col;
+	}
+
+	public void setRateCC_Col(List<RateCC> rateCC_Col) {
+		this.rateCC_Col = rateCC_Col;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 
 }

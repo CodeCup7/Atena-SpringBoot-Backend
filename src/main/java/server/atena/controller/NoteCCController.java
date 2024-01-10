@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class NoteCCController {
         ObjectMapper objectMapper = new ObjectMapper();
         final NoteCC noteCC = objectMapper.readValue(json_rateCC, NoteCC.class);;
 
-        noteCC.getRateCC_list().forEach(e->{
+        noteCC.getRateCC_Col().forEach(e->{
         	e.setNote(noteCC);
         });
     	
@@ -47,4 +48,14 @@ public class NoteCCController {
         Iterable<NoteCC> noteList = service.getAllNote();
         return ResponseEntity.ok(noteList);
     }
+    
+    @GetMapping("/getAllNoteBetweenDates/{dateStart}/{dateEnd}")
+    public ResponseEntity<Iterable<NoteCC>> getAllNoteDates(@PathVariable String  dateStart, @PathVariable String  dateEnd) {
+        Iterable<NoteCC> noteList = service.getAllNoteDates(dateStart, dateEnd);
+        return ResponseEntity.ok(noteList);
+        
+    } 
+    
+
+    
 }

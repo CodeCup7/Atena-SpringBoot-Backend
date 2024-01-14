@@ -32,6 +32,13 @@ public class RateCCService {
         iterable.forEach(rateList::add);
         return rateList;
     }
+    
+    public List<RateCC> getAllRateNoNote() {
+        Iterable<RateCC> iterable = repository.getAllRateNoNote();
+        List<RateCC> rateList = new ArrayList<>();
+        iterable.forEach(rateList::add);
+        return rateList;
+    }
 
     public void update(RateCC rateCC) {
         repository.save(rateCC);

@@ -2,6 +2,7 @@ package server.atena.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
@@ -50,8 +51,11 @@ public class RateCC {
 	private String topic;
 	private long extraScore;
 	private String extraScoreTxt;
+	
+	
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "rate", orphanRemoval = true)
+	@JsonManagedReference
 	private List<RatePart> ratePart;
 
 	public List<RatePart> getRatePart() {

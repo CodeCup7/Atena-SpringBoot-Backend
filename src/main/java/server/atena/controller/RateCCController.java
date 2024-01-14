@@ -1,7 +1,10 @@
 package server.atena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.RateCC;
+import server.atena.models.User;
 import server.atena.service.RateCCService;
 
 @RestController
@@ -39,4 +43,20 @@ public class RateCCController {
         service.add(rateCC);
         
     }
+    
+    //Pobiera wszystkie RateCC które nie są przypisane do coachingu
+	@GetMapping("/getAllRates")
+	public ResponseEntity<Iterable<RateCC>> getAllRates() {
+		Iterable<RateCC> rates = service.getAllRates();
+		return ResponseEntity.ok(rates);
+	}
+    
+    //Pobiera wszystkie RateCC które nie są przypisane do coachingu
+	@GetMapping("/getAllRateNoNote")
+	public ResponseEntity<Iterable<RateCC>> getAllRateNoNote() {
+		Iterable<RateCC> rates = service.getAllRateNoNote();
+		return ResponseEntity.ok(rates);
+	}
+	
+	
 }

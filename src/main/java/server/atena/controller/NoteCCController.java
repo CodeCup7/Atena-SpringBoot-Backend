@@ -1,8 +1,11 @@
 package server.atena.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.NoteCC;
+import server.atena.models.User;
 import server.atena.service.NoteCCService;
 
 @RestController
@@ -55,6 +59,24 @@ public class NoteCCController {
         return ResponseEntity.ok(noteList);
         
     } 
+    
+	@PostMapping("/update")
+	public void update(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		NoteCC noteCC = null;
+		try {
+			noteCC = objectMapper.readValue(json_rateCC, NoteCC.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		service.update(noteCC);
+
+	}
+	
+	@DeleteMapping("/delete/{id}")
+	public void deleteById(@PathVariable Long id) {
+		service.deleteById(id);
+	}
     
 
     

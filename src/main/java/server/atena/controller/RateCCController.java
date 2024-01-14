@@ -1,8 +1,11 @@
 package server.atena.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,44 +22,63 @@ import server.atena.models.User;
 import server.atena.service.RateCCService;
 
 @RestController
-@RequestMapping("/api/rateCC") 
+@RequestMapping("/api/rateCC")
 @CrossOrigin(origins = "http://localhost:3000")
 public class RateCCController {
-	
+
 	private final RateCCService service;
 
-    @Autowired
-    public RateCCController(RateCCService service) {
-        this.service = service;
-    }
-    
-    @PostMapping("/add") 
-    public void add(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
+	@Autowired
+	public RateCCController(RateCCService service) {
+		this.service = service;
+	}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);;
+	@PostMapping("/add")
+	public void add(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
 
-        rateCC.getRatePart().forEach(e->{
-        	e.setRate(rateCC);
-        });
-    	
-        service.add(rateCC);
-        
-    }
-    
-    //Pobiera wszystkie RateCC które nie są przypisane do coachingu
+		ObjectMapper objectMapper = new ObjectMapper();
+		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
+		;
+
+		rateCC.getRatePart().forEach(e -> {
+			e.setRate(rateCC);
+		});
+
+		service.add(rateCC);
+
+	}
+
+	// Pobiera wszystkie RateCC które nie są przypisane do coachingu
 	@GetMapping("/getAllRates")
 	public ResponseEntity<Iterable<RateCC>> getAllRates() {
 		Iterable<RateCC> rates = service.getAllRates();
 		return ResponseEntity.ok(rates);
 	}
-    
-    //Pobiera wszystkie RateCC które nie są przypisane do coachingu
+
+	// Pobiera wszystkie RateCC które nie są przypisane do coachingu
 	@GetMapping("/getAllRateNoNote")
 	public ResponseEntity<Iterable<RateCC>> getAllRateNoNote() {
 		Iterable<RateCC> rates = service.getAllRateNoNote();
 		return ResponseEntity.ok(rates);
 	}
-	
-	
+
+	@PostMapping("/update")
+	public void update(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		RateCC rateCC = null;
+		try {
+			rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		service.update(rateCC);
+
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public void deleteById(@PathVariable Long id) {
+		service.deleteById(id);
+	}
+
 }

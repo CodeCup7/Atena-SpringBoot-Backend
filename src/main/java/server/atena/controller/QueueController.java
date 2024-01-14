@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +16,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.Queue;
-import server.atena.models.RateCC;
-import server.atena.models.User;
 import server.atena.service.QueueService;
-import server.atena.service.UserService;
-
+									
 @RestController
 @RequestMapping("/api/queue") // Dostosuj ścieżkę URL do swoich potrzeb
 @CrossOrigin(origins = "http://localhost:3000")
@@ -54,7 +53,7 @@ public class QueueController {
     public void addList(@RequestBody String json_rateCC) {
     	ObjectMapper objectMapper = new ObjectMapper();
 
-        try {
+        try {	
             List<Queue> myObjectList = objectMapper.readValue(json_rateCC, new TypeReference<List<Queue>>() {});
 
             for (Queue queue : myObjectList) {
@@ -65,5 +64,24 @@ public class QueueController {
         }
        
     }
+    
+	@PostMapping("/update")
+	public void update(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		Queue queue = null;
+		try {
+			queue = objectMapper.readValue(json_rateCC, Queue.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		service.update(queue);
+
+	}
+    
+	@DeleteMapping("/delete/{id}")
+	public void deleteById(@PathVariable Long id) {
+		service.delete(id);
+	}
 
 }

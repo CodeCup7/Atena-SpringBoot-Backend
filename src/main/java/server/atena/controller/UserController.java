@@ -55,7 +55,7 @@ public class UserController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(user);
+
 		service.update(user);
 
 	}

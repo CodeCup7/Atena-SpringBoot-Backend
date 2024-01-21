@@ -38,7 +38,6 @@ public class RateCCController {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
-		;
 
 		rateCC.getRatePart().forEach(e -> {
 			e.setRate(rateCC);

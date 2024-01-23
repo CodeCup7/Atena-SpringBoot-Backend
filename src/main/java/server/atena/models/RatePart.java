@@ -10,11 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class RatePart{
+public class RatePart {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	private String key;
 	private long ocena;
 	private long waga;
@@ -23,26 +23,24 @@ public class RatePart{
 	private String uwagi;
 	
 	@ManyToOne
-	@JoinColumn(name = "rate_id")
-	@JsonBackReference
-	private RateCC rate;
-	
-	
+	@JoinColumn(name = "rateBlock_id")
+	private RateBlock rateBlock;
+
+
+	public RateBlock getRateBlock() {
+		return rateBlock;
+	}
+
+	public void setRateBlock(RateBlock rateBlock) {
+		this.rateBlock = rateBlock;
+	}
+
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-
-	public RateCC getRate() {
-		return rate;
-	}
-
-	public void setRate(RateCC rate) {
-		this.rate = rate;
 	}
 
 	public String getKey() {

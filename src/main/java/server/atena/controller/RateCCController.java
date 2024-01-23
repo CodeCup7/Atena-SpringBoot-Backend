@@ -39,10 +39,6 @@ public class RateCCController {
 		ObjectMapper objectMapper = new ObjectMapper();
 		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
 
-		rateCC.getRatePart().forEach(e -> {
-			e.setRate(rateCC);
-		});
-
 		service.add(rateCC);
 
 	}
@@ -62,14 +58,9 @@ public class RateCCController {
 	}
 
 	@PostMapping("/update")
-	public void update(@RequestBody String json_rateCC) {
+	public void update(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException  {
 		ObjectMapper objectMapper = new ObjectMapper();
-		RateCC rateCC = null;
-		try {
-			rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
 
 		service.update(rateCC);
 

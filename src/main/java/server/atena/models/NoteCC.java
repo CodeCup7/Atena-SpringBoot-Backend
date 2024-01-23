@@ -35,7 +35,8 @@ public class NoteCC {
 	private String odwolanie;
 	private String mode;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "note", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "noteCC_id")
 	private List<RateCC> rateCC_Col;
 
 	public long getId() {

@@ -39,10 +39,6 @@ public class NoteCCController {
         ObjectMapper objectMapper = new ObjectMapper();
         final NoteCC noteCC = objectMapper.readValue(json_rateCC, NoteCC.class);;
 
-        noteCC.getRateCC_Col().forEach(e->{
-        	e.setNote(noteCC);
-        });
-    	
         service.add(noteCC);
         
     }

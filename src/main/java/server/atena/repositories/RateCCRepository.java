@@ -9,7 +9,7 @@ import server.atena.models.RateCC;
 public interface RateCCRepository extends CrudRepository<RateCC, Long> {
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	@Query("SELECT r FROM RateCC r WHERE r.id_note = 0")
+	@Query("SELECT r FROM RateCC r WHERE r.noteCC.id = 0")
 	Iterable<RateCC> getAllRateNoNote();
 
 }

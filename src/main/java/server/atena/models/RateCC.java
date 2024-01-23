@@ -2,7 +2,6 @@ package server.atena.models;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
@@ -15,23 +14,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import server.atena.app.RateMode;
 import server.atena.app.TypeRateCC;
 
 @Entity
 public class RateCC {
-	
-	@ManyToOne
-	@JoinColumn(name="note_id")
-    private NoteCC note;
-	
+
 	@Enumerated(EnumType.STRING)
 	private TypeRateCC typeRate;
+	
+	@Enumerated(EnumType.STRING)
+	private RateMode mode;
 
-	private long id_note;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	private double rate;
+
+	@ManyToOne
+	@JoinColumn(name = "noteCC_id")
+	private NoteCC noteCC;
+
 	@ManyToOne
 	@JoinColumn(name = "agent_id")
 	@JsonProperty("agent")
@@ -51,20 +54,35 @@ public class RateCC {
 	private String topic;
 	private long extraScore;
 	private String extraScoreTxt;
-	
-	
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "rate", orphanRemoval = true)
-	@JsonManagedReference
-	private List<RatePart> ratePart;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wiedzaBlock_id")
+    private RateBlock wiedzaBlock;
 
-	public List<RatePart> getRatePart() {
-		return ratePart;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "obslugaBlock_id")
+    private RateBlock obslugaBlock;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "technikaBlock_id")
+    private RateBlock technikaBlock;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "komunikacjaBlock_id")
+    private RateBlock komunikacjaBlock;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "standardBlock_id")
+    private RateBlock standardBlock;
+
+	public RateMode getMode() {
+		return mode;
 	}
 
-	public void setRatePart(List<RatePart> ratePart) {
-		this.ratePart = ratePart;
+	public void setMode(RateMode mode) {
+		this.mode = mode;
 	}
+
 
 	public TypeRateCC getTypeRate() {
 		return typeRate;
@@ -74,28 +92,12 @@ public class RateCC {
 		this.typeRate = typeRate;
 	}
 
-	public long getId_note() {
-		return id_note;
-	}
-
-	public void setId_note(long id_note) {
-		this.id_note = id_note;
-	}
-
 	public long getId() {
 		return id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public double getRate() {
-		return rate;
-	}
-
-	public void setRate(double rate) {
-		this.rate = rate;
 	}
 
 	public User getAgent() {
@@ -178,14 +180,54 @@ public class RateCC {
 		this.extraScoreTxt = extraScoreTxt;
 	}
 
-	public NoteCC getNote() {
-		return note;
+	public NoteCC getNoteCC() {
+		return noteCC;
 	}
 
-	public void setNote(NoteCC note) {
-		this.note = note;
+	public void setNoteCC(NoteCC noteCC) {
+		this.noteCC = noteCC;
 	}
-	
-	
+
+	public RateBlock getWiedzaBlock() {
+		return wiedzaBlock;
+	}
+
+	public void setWiedzaBlock(RateBlock wiedzaBlock) {
+		this.wiedzaBlock = wiedzaBlock;
+	}
+
+	public RateBlock getObslugaBlock() {
+		return obslugaBlock;
+	}
+
+	public void setObslugaBlock(RateBlock obslugaBlock) {
+		this.obslugaBlock = obslugaBlock;
+	}
+
+	public RateBlock getTechnikaBlock() {
+		return technikaBlock;
+	}
+
+	public void setTechnikaBlock(RateBlock technikaBlock) {
+		this.technikaBlock = technikaBlock;
+	}
+
+	public RateBlock getKomunikacjaBlock() {
+		return komunikacjaBlock;
+	}
+
+	public void setKomunikacjaBlock(RateBlock komunikacjaBlock) {
+		this.komunikacjaBlock = komunikacjaBlock;
+	}
+
+	public RateBlock getStandardBlock() {
+		return standardBlock;
+	}
+
+	public void setStandardBlock(RateBlock standardBlock) {
+		this.standardBlock = standardBlock;
+	}
+
+
 
 }

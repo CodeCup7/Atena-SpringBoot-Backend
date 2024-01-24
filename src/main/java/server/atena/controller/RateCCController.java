@@ -56,6 +56,12 @@ public class RateCCController {
 		Iterable<RateCC> rates = service.getAllRateNoNote();
 		return ResponseEntity.ok(rates);
 	}
+	
+	@GetMapping("/getById/{id}")
+	public ResponseEntity<RateCC> getById(@PathVariable Long id) {
+		RateCC rateCC = service.getById(id);
+		return ResponseEntity.ok(rateCC);
+	}
 
 	@PostMapping("/update")
 	public void update(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException  {

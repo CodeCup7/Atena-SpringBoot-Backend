@@ -1,13 +1,9 @@
 package server.atena.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Entity
 public class RatePart {
@@ -22,19 +18,6 @@ public class RatePart {
 	private String opis;
 	private String uwagi;
 	
-	@ManyToOne
-	@JoinColumn(name = "rateBlock_id")
-	private RateBlock rateBlock;
-
-
-	public RateBlock getRateBlock() {
-		return rateBlock;
-	}
-
-	public void setRateBlock(RateBlock rateBlock) {
-		this.rateBlock = rateBlock;
-	}
-
 	public Long getId() {
 		return id;
 	}

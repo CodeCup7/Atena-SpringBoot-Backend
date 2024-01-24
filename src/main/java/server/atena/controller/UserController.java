@@ -86,6 +86,7 @@ public class UserController {
 	@GetMapping("/getUserLogin/{login}")
 	public ResponseEntity<User> getUserLogin(@PathVariable String login) {
 		User user = service.getUserByLogin(login);
+		System.out.println("GET USER BY LOGIN");
 		return ResponseEntity.ok(user);
 	}
 

@@ -1,9 +1,6 @@
 package server.atena.models;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import server.atena.app.RateMode;
 import server.atena.app.TypeRateCC;
@@ -30,10 +26,6 @@ public class RateCC {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-
-	@ManyToOne
-	@JoinColumn(name = "noteCC_id")
-	private NoteCC noteCC;
 
 	@ManyToOne
 	@JoinColumn(name = "agent_id")
@@ -178,14 +170,6 @@ public class RateCC {
 
 	public void setExtraScoreTxt(String extraScoreTxt) {
 		this.extraScoreTxt = extraScoreTxt;
-	}
-
-	public NoteCC getNoteCC() {
-		return noteCC;
-	}
-
-	public void setNoteCC(NoteCC noteCC) {
-		this.noteCC = noteCC;
 	}
 
 	public RateBlock getWiedzaBlock() {

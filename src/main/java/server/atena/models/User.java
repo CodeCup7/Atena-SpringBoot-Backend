@@ -6,7 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import server.atena.app.Role;
+import server.atena.app.enums.Role;
 
 @Entity
 public class User {

@@ -2,6 +2,8 @@ package server.atena.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
@@ -12,7 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import server.atena.app.StatusNote;
+import server.atena.app.enums.StatusNote;
 
 @Entity
 public class NoteCC {
@@ -35,8 +37,7 @@ public class NoteCC {
 	private String odwolanie;
 	private String mode;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "noteCC_id")
+	@OneToMany(mappedBy = "noteCC", orphanRemoval = true)
 	private List<RateCC> rateCC_Col;
 
 	public long getId() {

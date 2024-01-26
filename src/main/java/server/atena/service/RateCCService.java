@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.repositories.RateCCRepository;
 
@@ -35,6 +37,13 @@ public class RateCCService {
     
     public List<RateCC> getAllRateNoNote() {
         Iterable<RateCC> iterable = repository.getAllRateNoNote();
+        List<RateCC> rateList = new ArrayList<>();
+        iterable.forEach(rateList::add);
+        return rateList;
+    }
+    
+    public List<RateCC> getAllRateCCByNoteId(NoteCC noteCC) {
+        Iterable<RateCC> iterable = repository.getAllRateCCByNoteId(noteCC);
         List<RateCC> rateList = new ArrayList<>();
         iterable.forEach(rateList::add);
         return rateList;

@@ -18,8 +18,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.NoteCC;
+import server.atena.models.RateCC;
 import server.atena.models.User;
 import server.atena.service.NoteCCService;
+import server.atena.service.RateCCService;
 
 @RestController
 @RequestMapping("/api/noteCC")
@@ -27,10 +29,12 @@ import server.atena.service.NoteCCService;
 public class NoteCCController {
 	
 	private final NoteCCService service;
+	private final RateCCService serviceRateCC;
 
     @Autowired
-    public NoteCCController(NoteCCService service) {
+    public NoteCCController(NoteCCService service, RateCCService serviceRateCC) {
         this.service = service;
+        this.serviceRateCC = serviceRateCC;
     }
     
     @PostMapping("/add") 
@@ -57,11 +61,11 @@ public class NoteCCController {
     } 
     
 	@PostMapping("/update")
-	public void update(@RequestBody String json_rateCC) {
+	public void update(@RequestBody String json_noteCC) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		NoteCC noteCC = null;
 		try {
-			noteCC = objectMapper.readValue(json_rateCC, NoteCC.class);
+			noteCC = objectMapper.readValue(json_noteCC, NoteCC.class);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -69,9 +73,25 @@ public class NoteCCController {
 
 	}
 	
-	@DeleteMapping("/delete/{id}")
-	public void deleteById(@PathVariable Long id) {
-		service.deleteById(id);
+	@DeleteMapping("/delete")
+	public void deleteById(@RequestBody String json_noteCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		NoteCC noteCC = null;
+		try {
+			noteCC = objectMapper.readValue(json_noteCC, NoteCC.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+
+		//Pobranie wszystkich RateCC gdzie noteCC_id = id i ustawienie tych note_id na NULL (wyzerowanie ocen rateCC względem noteCC - skasowanie relacji)
+		Iterable<RateCC> rateList = serviceRateCC.getAllRateCCByNoteId(noteCC);
+		rateList.forEach(e->{
+			e.setNoteCC(null);
+			serviceRateCC.update(e);
+		});
+		
+		service.deleteById(noteCC.getId());
 	}
     
 

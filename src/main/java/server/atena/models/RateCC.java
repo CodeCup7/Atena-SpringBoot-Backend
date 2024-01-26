@@ -1,5 +1,6 @@
 package server.atena.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -11,17 +12,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import server.atena.app.RateMode;
-import server.atena.app.TypeRateCC;
+import server.atena.app.enums.RateMode;
+import server.atena.app.enums.TypeRateCC;
 
 @Entity
 public class RateCC {
 
 	@Enumerated(EnumType.STRING)
 	private TypeRateCC typeRate;
-	
+
 	@Enumerated(EnumType.STRING)
 	private RateMode mode;
+
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "noteCC_id")
+	private NoteCC noteCC;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,25 +53,33 @@ public class RateCC {
 	private long extraScore;
 	private String extraScoreTxt;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "wiedzaBlock_id")
-    private RateBlock wiedzaBlock;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "wiedzaBlock_id")
+	private RateBlock wiedzaBlock;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "obslugaBlock_id")
-    private RateBlock obslugaBlock;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "obslugaBlock_id")
+	private RateBlock obslugaBlock;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "technikaBlock_id")
-    private RateBlock technikaBlock;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "technikaBlock_id")
+	private RateBlock technikaBlock;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "komunikacjaBlock_id")
-    private RateBlock komunikacjaBlock;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "komunikacjaBlock_id")
+	private RateBlock komunikacjaBlock;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "standardBlock_id")
-    private RateBlock standardBlock;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "standardBlock_id")
+	private RateBlock standardBlock;
+
+	public NoteCC getNoteCC() {
+		return noteCC;
+	}
+
+	public void setNoteCC(NoteCC noteCC) {
+		this.noteCC = noteCC;
+	}
 
 	public RateMode getMode() {
 		return mode;
@@ -74,7 +88,6 @@ public class RateCC {
 	public void setMode(RateMode mode) {
 		this.mode = mode;
 	}
-
 
 	public TypeRateCC getTypeRate() {
 		return typeRate;
@@ -211,7 +224,5 @@ public class RateCC {
 	public void setStandardBlock(RateBlock standardBlock) {
 		this.standardBlock = standardBlock;
 	}
-
-
 
 }

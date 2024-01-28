@@ -1,8 +1,10 @@
 package server.atena.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +19,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
+import server.atena.models.SearchCriteria;
 import server.atena.models.User;
 import server.atena.service.RateCCService;
 
@@ -34,16 +38,25 @@ public class RateCCController {
 	}
 
 	@PostMapping("/add")
-	public void add(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<RateCC> add(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
 
-		service.add(rateCC);
+            RateCC addedRateCC = service.add(rateCC);
 
+            return new ResponseEntity<>(addedRateCC, HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 	}
+	
+	@PostMapping("/search")
+    public List<RateCC> searchNotes(@RequestBody List<SearchCriteria> params) {
+        return service.searchRates(params);
+    }
 
-	// Pobiera wszystkie RateCC które nie są przypisane do coachingu
 	@GetMapping("/getAllRates")
 	public ResponseEntity<Iterable<RateCC>> getAllRates() {
 		Iterable<RateCC> rates = service.getAllRates();
@@ -69,7 +82,6 @@ public class RateCCController {
 		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
 
 		service.update(rateCC);
-
 	}
 
 	@DeleteMapping("/delete/{id}")

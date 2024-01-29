@@ -1,15 +1,11 @@
 package server.atena.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import jakarta.persistence.criteria.Join;
 import server.atena.models.NoteCC;
 import server.atena.models.SearchCriteria;
@@ -35,8 +31,6 @@ public class NoteCCService {
 		for (SearchCriteria param : params) {
 			spec = spec.and((root, query, builder) -> {
 				
-				System.out.print(param.getOperation());
-
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("appliesDate".equals(param.getKey())) {
 						String[] dateRange = param.getValue().toString().split(" AND ");
@@ -52,6 +46,11 @@ public class NoteCCService {
 					}
 				}
 				
+				if (param.getOperation().equalsIgnoreCase("LIKE")) {
+					return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
+				}
+				
+
 				if (param.getOperation().equalsIgnoreCase(":")) {
 					if ("agent".equals(param.getKey())) {
 						Join<NoteCC, User> agentJoin = root.join("agent");
@@ -59,8 +58,6 @@ public class NoteCCService {
 					} else if ("coach".equals(param.getKey())) {
 						Join<NoteCC, User> coachJoin = root.join("coach");
 						return builder.equal(coachJoin.get("id"), Long.parseLong(param.getValue().toString()));
-					} else if (param.getOperation().equalsIgnoreCase("LIKE")) {
-		                    return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
 					} else {
 						return builder.equal(root.get(param.getKey()), param.getValue());
 					}

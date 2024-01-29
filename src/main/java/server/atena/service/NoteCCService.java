@@ -34,6 +34,8 @@ public class NoteCCService {
 
 		for (SearchCriteria param : params) {
 			spec = spec.and((root, query, builder) -> {
+				
+				System.out.print(param.getOperation());
 
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("appliesDate".equals(param.getKey())) {
@@ -42,8 +44,14 @@ public class NoteCCService {
 						String endDate = dateRange[1];
 						return builder.between(root.get(param.getKey()), startDate, endDate);
 					}
+					if ("coachDate".equals(param.getKey())) {
+						String[] dateRange = param.getValue().toString().split(" AND ");
+						String startDate = dateRange[0];
+						String endDate = dateRange[1];
+						return builder.between(root.get(param.getKey()), startDate, endDate);
+					}
 				}
-
+				
 				if (param.getOperation().equalsIgnoreCase(":")) {
 					if ("agent".equals(param.getKey())) {
 						Join<NoteCC, User> agentJoin = root.join("agent");
@@ -51,6 +59,8 @@ public class NoteCCService {
 					} else if ("coach".equals(param.getKey())) {
 						Join<NoteCC, User> coachJoin = root.join("coach");
 						return builder.equal(coachJoin.get("id"), Long.parseLong(param.getValue().toString()));
+					} else if (param.getOperation().equalsIgnoreCase("LIKE")) {
+		                    return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
 					} else {
 						return builder.equal(root.get(param.getKey()), param.getValue());
 					}
@@ -60,7 +70,8 @@ public class NoteCCService {
 			});
 		}
 
-		return repository.findAll(spec, Sort.unsorted());
+	return repository.findAll(spec,Sort.unsorted());
+
 	}
 
 	public NoteCC add(NoteCC noteCC) {

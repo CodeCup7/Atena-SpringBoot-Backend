@@ -29,5 +29,4 @@ public class SearchCriteria {
 	public void setValue(Object value) {
 		this.value = value;
 	}
-
 }

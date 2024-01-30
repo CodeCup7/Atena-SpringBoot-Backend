@@ -47,6 +47,17 @@ public class RateCCService {
 						String endDate = dateRange[1];
 						return builder.between(root.get(param.getKey()), startDate, endDate);
 					}
+					
+					if ("callDate".equals(param.getKey())) {
+						String[] dateRange = param.getValue().toString().split(" AND ");
+						String startDate = dateRange[0];
+						String endDate = dateRange[1];
+						return builder.between(root.get(param.getKey()), startDate, endDate);
+					}
+					
+					
+					
+					
 				}
 
 				if (param.getOperation().equalsIgnoreCase(":")) {

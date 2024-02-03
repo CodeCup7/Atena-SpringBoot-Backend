@@ -21,10 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
+import server.atena.models.RateM;
 import server.atena.models.SearchCriteria;
 import server.atena.models.User;
 import server.atena.service.NoteCCService;
 import server.atena.service.RateCCService;
+import server.atena.service.RateMService;
 
 @RestController
 @RequestMapping("/api/noteCC")
@@ -33,11 +35,13 @@ public class NoteCCController {
 
 	private final NoteCCService service;
 	private final RateCCService serviceRateCC;
+	private final RateMService serviceRateM;
 
 	@Autowired
-	public NoteCCController(NoteCCService service, RateCCService serviceRateCC) {
+	public NoteCCController(NoteCCService service, RateCCService serviceRateCC, RateMService serviceRateM) {
 		this.service = service;
 		this.serviceRateCC = serviceRateCC;
+		this.serviceRateM = serviceRateM;
 	}
 	
 	@PostMapping("/search")
@@ -95,10 +99,18 @@ public class NoteCCController {
 
 		// Pobranie wszystkich RateCC gdzie noteCC_id = id i ustawienie tych note_id na
 		// NULL (wyzerowanie ocen rateCC względem noteCC - skasowanie relacji)
-		Iterable<RateCC> rateList = serviceRateCC.getAllRateCCByNoteId(noteCC);
-		rateList.forEach(e -> {
+		Iterable<RateCC> rateCCList = serviceRateCC.getAllRateCCByNoteId(noteCC);
+		rateCCList.forEach(e -> {
 			e.setNoteCC(null);
 			serviceRateCC.update(e);
+		});
+		
+		// Pobranie wszystkich RateM gdzie noteCC_id = id i ustawienie tych note_id na
+		// NULL (wyzerowanie ocen rateM względem noteCC - skasowanie relacji)
+		Iterable<RateM> rateMList = serviceRateM.getAllRateMByNoteId(noteCC);
+		rateMList.forEach(e -> {
+			e.setNoteCC(null);
+			serviceRateM.update(e);
 		});
 
 		service.deleteById(noteCC.getId());

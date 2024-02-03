@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -21,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
+import server.atena.models.RateM;
 import server.atena.models.SearchCriteria;
 import server.atena.models.User;
 import server.atena.service.RateCCService;
@@ -51,6 +54,8 @@ public class RateCCController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 	}
+	
+
 	
 	@PostMapping("/search")
     public List<RateCC> searchNotes(@RequestBody List<SearchCriteria> params) {

@@ -14,11 +14,11 @@ import server.atena.models.RateM;
 public interface RateMRepository extends CrudRepository<RateM, Long>, JpaSpecificationExecutor<RateM>{
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	@Query("SELECT r FROM RateCC r WHERE r.noteCC IS NULL")
+	@Query("SELECT r FROM RateM r WHERE r.noteCC IS NULL")
 	Iterable<RateM> getAllRateNoNote();
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	@Query("SELECT r FROM RateCC r WHERE r.noteCC = :note")
+	@Query("SELECT r FROM RateM r WHERE r.noteCC = :note")
 	List<RateM> getAllRateMByNoteId(@Param("note") NoteCC noteCC);;
 
 }

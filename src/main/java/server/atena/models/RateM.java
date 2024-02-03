@@ -1,5 +1,10 @@
 package server.atena.models;
 
+import java.util.List;
+
+import org.springframework.data.annotation.Transient;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
@@ -11,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import server.atena.app.enums.RateMode;
 
@@ -43,6 +49,10 @@ public class RateM {
 	private String extraScoreTxt;
 	private String attachmentPath;
 
+//	@OneToMany(cascade = CascadeType.ALL)
+//	@JoinColumn(name = "rateM_id")
+//	private List<Attachment> attachments;
+
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "wiedzaBlock_id")
 	private RateBlock wiedzaBlock;
@@ -56,12 +66,16 @@ public class RateM {
 	private RateBlock technikaBlock;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "komunikacjaBlock_id")
-	private RateBlock komunikacjaBlock;
-
-	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "standardBlock_id")
 	private RateBlock standardBlock;
+
+//	public List<Attachment> getAttachments() {
+//		return attachments;
+//	}
+//
+//	public void setAttachments(List<Attachment> attachments) {
+//		this.attachments = attachments;
+//	}
 
 	public RateMode getMode() {
 		return mode;
@@ -135,14 +149,6 @@ public class RateM {
 		this.extraScoreTxt = extraScoreTxt;
 	}
 
-	public String getAttachmentPath() {
-		return attachmentPath;
-	}
-
-	public void setAttachmentPath(String attachmentPath) {
-		this.attachmentPath = attachmentPath;
-	}
-
 	public RateBlock getWiedzaBlock() {
 		return wiedzaBlock;
 	}
@@ -167,20 +173,20 @@ public class RateM {
 		this.technikaBlock = technikaBlock;
 	}
 
-	public RateBlock getKomunikacjaBlock() {
-		return komunikacjaBlock;
-	}
-
-	public void setKomunikacjaBlock(RateBlock komunikacjaBlock) {
-		this.komunikacjaBlock = komunikacjaBlock;
-	}
-
 	public RateBlock getStandardBlock() {
 		return standardBlock;
 	}
 
 	public void setStandardBlock(RateBlock standardBlock) {
 		this.standardBlock = standardBlock;
+	}
+
+	public String getAttachmentPath() {
+		return attachmentPath;
+	}
+
+	public void setAttachmentPath(String attachmentPath) {
+		this.attachmentPath = attachmentPath;
 	}
 
 }

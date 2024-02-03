@@ -1,8 +1,17 @@
 package server.atena.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,22 +21,32 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import server.atena.models.NoteCC;
+
 import server.atena.models.RateM;
 import server.atena.models.SearchCriteria;
-import server.atena.models.User;
 import server.atena.service.RateMService;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+
 @RestController
-@RequestMapping("/api/RateM")
+@RequestMapping("/api/rateM")
 @CrossOrigin(origins = "http://localhost:3000")
 public class RateMController {
 
 	private final RateMService service;
+
+	@Value("${attachment.upload.dir}")
+	private String uploadDir;
 
 	@Autowired
 	public RateMController(RateMService service) {
@@ -35,19 +54,29 @@ public class RateMController {
 	}
 
 	@PostMapping("/add")
-	public ResponseEntity<RateM> add(@RequestBody String json_RateM)
-			throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<RateM> add(@RequestPart("rateM") String rateMJson, @RequestPart("file") MultipartFile file)
+			throws IOException {
 
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			final RateM RateM = objectMapper.readValue(json_RateM, RateM.class);
+		ObjectMapper objectMapper = new ObjectMapper();
+		RateM rateM = objectMapper.readValue(rateMJson, RateM.class);
 
-			RateM addedRateM = service.add(RateM);
+		RateM addedRateM = service.add(rateM);
 
-			return new ResponseEntity<>(addedRateM, HttpStatus.OK);
-		} catch (JsonProcessingException e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		String fileName = String.valueOf(addedRateM.getId()) + "_" + file.getOriginalFilename();
+		Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
+		Path filePath = uploadPath.resolve(fileName);
+		
+		try (InputStream fileInputStream = file.getInputStream()) {
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+		// Aktualizacja DB ścieżka do pliku
+		addedRateM.setAttachmentPath(fileName);
+		service.update(addedRateM);
+
+		return new ResponseEntity<>(addedRateM, HttpStatus.OK);
 	}
 
 	@PostMapping("/search")
@@ -73,13 +102,41 @@ public class RateMController {
 		RateM RateM = service.getById(id);
 		return ResponseEntity.ok(RateM);
 	}
+	
+    @GetMapping("/getAttachment")
+    public ResponseEntity<Resource> downloadFile(@RequestParam String fileName) throws IOException {
+        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+        Resource resource = new UrlResource(filePath.toUri());
+        System.out.println(fileName);
+        System.out.println(filePath);
+        System.out.println(resource);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+            .body(resource);
+    }
 
 	@PostMapping("/update")
-	public void update(@RequestBody String json_RateM) throws JsonMappingException, JsonProcessingException {
+	public void update(@RequestPart("rateM") String rateMJson, @RequestPart("file") MultipartFile file) throws IOException, InterruptedException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		final RateM RateM = objectMapper.readValue(json_RateM, RateM.class);
+		RateM rateM = objectMapper.readValue(rateMJson, RateM.class);
 
-		service.update(RateM);
+		// Usunięcie starego pliku !!!!!!!!!!!!!!!
+	    Files.delete(Paths.get(rateM.getAttachmentPath()));
+	    
+		String fileName = String.valueOf(rateM.getId()) + "_" + file.getOriginalFilename();
+		Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
+		Path filePath = uploadPath.resolve(fileName);
+		
+		try (InputStream fileInputStream = file.getInputStream()) {
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Aktualizacja DB ścieżka do pliku
+		rateM.setAttachmentPath(fileName);
+		service.update(rateM);
 	}
 
 	@DeleteMapping("/delete/{id}")

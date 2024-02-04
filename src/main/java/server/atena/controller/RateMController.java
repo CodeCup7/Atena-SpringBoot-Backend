@@ -107,9 +107,6 @@ public class RateMController {
     public ResponseEntity<Resource> downloadFile(@RequestParam String fileName) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         Resource resource = new UrlResource(filePath.toUri());
-        System.out.println(fileName);
-        System.out.println(filePath);
-        System.out.println(resource);
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
@@ -120,22 +117,40 @@ public class RateMController {
 	public void update(@RequestPart("rateM") String rateMJson, @RequestPart("file") MultipartFile file) throws IOException, InterruptedException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		RateM rateM = objectMapper.readValue(rateMJson, RateM.class);
-
-		// Usunięcie starego pliku !!!!!!!!!!!!!!!
-	    Files.delete(Paths.get(rateM.getAttachmentPath()));
-	    
-		String fileName = String.valueOf(rateM.getId()) + "_" + file.getOriginalFilename();
-		Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
-		Path filePath = uploadPath.resolve(fileName);
 		
-		try (InputStream fileInputStream = file.getInputStream()) {
-			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
+		System.out.println(file);
+		
+		if(file != null) { // tylko gdy wraz z aktualizacją nastepuje podmiana pliku
+			
+			String fileName = String.valueOf(rateM.getId()) + "_" + file.getOriginalFilename();
+			Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
+			Path filePath = uploadPath.resolve(fileName);
+			
+			String fileNameToDelete = String.valueOf(rateM.getAttachmentPath());
+			Path deletePath = Path.of(uploadDir).toAbsolutePath().normalize();
+			Path fileDeletePath = deletePath.resolve(fileNameToDelete);
+			
+			
+			
+			System.out.println("fileName" + fileName);
+			System.out.println("uploadPath" + uploadPath);
+			System.out.println("filePath" + filePath);
+			System.out.println("deletePath" + deletePath);
+			System.out.println("fileDeletePath" + fileDeletePath);
+			
+			// Usunięcie starego pliku !!!!!!!!!!!!!!!
+		    Files.delete(fileDeletePath);
+		    
+			try (InputStream fileInputStream = file.getInputStream()) {
+				Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			// Aktualizacja DB ścieżka do pliku
+			rateM.setAttachmentPath(fileName);
 		}
-
-		// Aktualizacja DB ścieżka do pliku
-		rateM.setAttachmentPath(fileName);
+		
 		service.update(rateM);
 	}
 

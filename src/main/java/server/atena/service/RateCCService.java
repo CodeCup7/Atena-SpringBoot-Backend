@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.criteria.Join;
+import server.atena.app.enums.TypeRateCC;
 import server.atena.models.NoteCC;
 import server.atena.models.Queue;
 import server.atena.models.RateCC;
@@ -73,11 +74,22 @@ public class RateCCService {
 					} else if ("coach".equals(param.getKey())) {
 						Join<RateCC, User> coachJoin = root.join("coach");
 						return builder.equal(coachJoin.get("id"), Long.parseLong(param.getValue().toString()));
+					} else if ("typeRate".equals(param.getKey())) {
+						
+						if(param.getValue().equals("RATTING_")) {
+							param.setValue(TypeRateCC.RATTING_);
+							return builder.equal(root.get(param.getKey()), param.getValue());
+						} else if (param.getValue().equals("CURRENT_")) {
+							param.setValue(TypeRateCC.CURRENT_);
+							return builder.equal(root.get(param.getKey()), param.getValue());
+						} else if (param.getValue().equals("MYSTERY_")) {
+							param.setValue(TypeRateCC.MYSTERY_);
+							return builder.equal(root.get(param.getKey()), param.getValue());
+						}
 					} else {
 						return builder.equal(root.get(param.getKey()), param.getValue());
 					}
 				}
-				// Dodaj obsługę innych operacji, jeśli potrzebujesz
 				return null;
 			});
 		}

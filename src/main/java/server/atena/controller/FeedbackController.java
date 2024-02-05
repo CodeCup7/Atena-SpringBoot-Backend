@@ -3,6 +3,7 @@ package server.atena.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.Feedback;
+import server.atena.models.NoteCC;
 import server.atena.service.FeedbackService;
 									
 @RestController
@@ -31,8 +34,9 @@ public class FeedbackController {
     }
     
     @PostMapping("/add") 
-    public void add(@RequestBody String json_rateCC) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public ResponseEntity<Feedback> add(@RequestBody String json_rateCC) {
+    	
+    	ObjectMapper objectMapper = new ObjectMapper();
         Feedback feedback = null;
         try {
         	feedback = objectMapper.readValue(json_rateCC, Feedback.class);
@@ -40,7 +44,9 @@ public class FeedbackController {
             e.printStackTrace();
         }
     	
-        service.add(feedback);
+        Feedback addedFeedback = service.add(feedback);
+        
+		return new ResponseEntity<>(addedFeedback, HttpStatus.OK);
      
     }
     
@@ -53,6 +59,14 @@ public class FeedbackController {
 	public ResponseEntity<Iterable<Feedback>> getAll() {
 		Iterable<Feedback> feedback = service.getAll();
 		return ResponseEntity.ok(feedback);
+	}
+	
+	@GetMapping("/getAllFeedbackDates/{dateStart}/{dateEnd}")
+	public ResponseEntity<Iterable<Feedback>> getAllNoteDates(@PathVariable String dateStart,
+			@PathVariable String dateEnd) {
+		Iterable<Feedback> feedbackList = service.getAllNoteDates(dateStart, dateEnd);
+		return ResponseEntity.ok(feedbackList);
+
 	}
 
 }

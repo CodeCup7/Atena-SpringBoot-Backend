@@ -1,5 +1,8 @@
 package server.atena.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +19,9 @@ public class FeedbackService {
         this.repository = repository;
     }
     
-    public void add(Feedback e) {
-        repository.save(e);
+    public Feedback add(Feedback feedback) {
+    	Feedback addedFeedback= repository.save(feedback);
+		return addedFeedback;
     }
     	
     public void delete(Long e) {
@@ -36,5 +40,12 @@ public class FeedbackService {
     public void update(Feedback e) {
         repository.save(e);
     }
+    
+	public List<Feedback> getAllNoteDates(String startDate, String endDate) {
+		Iterable<Feedback> iterable = repository.getAllFeedbackDates(startDate, endDate);
+		List<Feedback> feedbackList = new ArrayList<>();
+		iterable.forEach(feedbackList::add);
+		return feedbackList;
+	}
 
 }

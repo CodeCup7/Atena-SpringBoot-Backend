@@ -37,6 +37,9 @@ public class NoteCC {
 	@OneToMany(mappedBy = "noteCC", orphanRemoval = true)
 	private List<RateCC> rateCC_Col;
 
+	@OneToMany(mappedBy = "noteCC", orphanRemoval = true)
+	private List<RateM> rateM_Col;
+
 	public long getId() {
 		return id;
 	}
@@ -115,6 +118,14 @@ public class NoteCC {
 
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	public List<RateM> getRateM_Col() {
+		return rateM_Col;
+	}
+
+	public void setRateM_Col(List<RateM> rateM_Col) {
+		this.rateM_Col = rateM_Col;
 	}
 
 }

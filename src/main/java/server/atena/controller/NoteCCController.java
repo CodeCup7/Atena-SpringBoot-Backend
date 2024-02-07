@@ -23,7 +23,6 @@ import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.RateM;
 import server.atena.models.SearchCriteria;
-import server.atena.models.User;
 import server.atena.service.NoteCCService;
 import server.atena.service.RateCCService;
 import server.atena.service.RateMService;

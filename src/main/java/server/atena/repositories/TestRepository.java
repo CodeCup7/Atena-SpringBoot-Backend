@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import server.atena.models.Feedback;
 import server.atena.models.Test;
 
 public interface TestRepository extends CrudRepository<Test, Long>, JpaSpecificationExecutor<Test> {

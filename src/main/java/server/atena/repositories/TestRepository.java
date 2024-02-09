@@ -2,13 +2,15 @@ package server.atena.repositories;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import server.atena.models.Feedback;
 import server.atena.models.Test;
 
-public interface TestRepository extends CrudRepository<Test, Long> {
+public interface TestRepository extends CrudRepository<Test, Long>, JpaSpecificationExecutor<Test> {
 	
     @Query("SELECT n FROM Test n WHERE n.dateTest BETWEEN :startDate AND :endDate")
     List<Test> getAllTestsDates(

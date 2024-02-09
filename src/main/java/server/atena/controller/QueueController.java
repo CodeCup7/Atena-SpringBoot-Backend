@@ -18,7 +18,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.Queue;
-import server.atena.models.User;
 import server.atena.service.QueueService;
 									
 @RestController

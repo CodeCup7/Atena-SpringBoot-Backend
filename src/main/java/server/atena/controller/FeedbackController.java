@@ -1,6 +1,7 @@
 package server.atena.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.Feedback;
-import server.atena.models.NoteCC;
+import server.atena.models.SearchCriteria;
 import server.atena.service.FeedbackService;
 									
 @RestController
@@ -49,6 +49,11 @@ public class FeedbackController {
 		return new ResponseEntity<>(addedFeedback, HttpStatus.OK);
      
     }
+    
+	@PostMapping("/search")
+	public List<Feedback> searchNotes(@RequestBody List<SearchCriteria> params) {
+		return service.searchRates(params);
+	}
     
 	@DeleteMapping("/delete/{id}")
 	public void deleteById(@PathVariable Long id) {

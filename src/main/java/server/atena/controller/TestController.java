@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import server.atena.models.SearchCriteria;
 import server.atena.models.Test;
 import server.atena.service.TestService;
 
@@ -51,7 +52,7 @@ public class TestController {
 	}
 
 	@PostMapping("/addList")
-	public void addList(@RequestBody String json_rateCC) {
+	public ResponseEntity<HttpStatus> addList(@RequestBody String json_rateCC) {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
@@ -65,7 +66,14 @@ public class TestController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return ResponseEntity.ok(HttpStatus.OK);
 
+	}
+	
+	@PostMapping("/search")
+	public List<Test> searchNotes(@RequestBody List<SearchCriteria> params) {
+		return service.searchRates(params);
 	}
 
 	@DeleteMapping("/delete/{id}")

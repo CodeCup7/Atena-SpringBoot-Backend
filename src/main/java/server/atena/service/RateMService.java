@@ -45,7 +45,6 @@ public class RateMService {
 						String endDate = dateRange[1];
 						return builder.between(root.get(param.getKey()), startDate, endDate);
 					}
-
 				}
 				
 				if (param.getOperation().equalsIgnoreCase("LIKE")) {

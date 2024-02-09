@@ -15,7 +15,7 @@ import server.atena.models.RateCC;
 public interface RateCCRepository extends CrudRepository<RateCC, Long>, JpaSpecificationExecutor<RateCC>{
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	@Query("SELECT r FROM RateCC r WHERE r.noteCC IS NULL")
+	@Query("SELECT r FROM RateCC r WHERE r.noteCC IS NULL AND r.typeRate = 'RATTING_'")
 	Iterable<RateCC> getAllRateNoNote();
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

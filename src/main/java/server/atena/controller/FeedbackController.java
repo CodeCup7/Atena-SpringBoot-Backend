@@ -60,6 +60,12 @@ public class FeedbackController {
 		service.delete(id);
 	}
 	
+	@GetMapping("/getById/{id}")
+	public ResponseEntity<Feedback> getById(@PathVariable Long id) {
+		Feedback feedback = service.getById(id);
+		return ResponseEntity.ok(feedback);
+	}
+	
 	@GetMapping("/getAll")
 	public ResponseEntity<Iterable<Feedback>> getAll() {
 		Iterable<Feedback> feedback = service.getAll();

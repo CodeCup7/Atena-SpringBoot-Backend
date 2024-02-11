@@ -73,7 +73,6 @@ public class QueueController {
 		Queue queue = null;
 		try {
 			queue = objectMapper.readValue(json_rateCC, Queue.class);
-			System.out.println(queue);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

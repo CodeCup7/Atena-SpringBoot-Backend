@@ -43,10 +43,13 @@ public class TestService {
 						return builder.between(root.get(param.getKey()), startDate, endDate);
 					}
 				}
+				
 				if (param.getOperation().equalsIgnoreCase("LIKE")) {
 					return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
 				}
+				
 				if (param.getOperation().equalsIgnoreCase(":")) {
+					
 					if ("agent".equals(param.getKey())) {
 						Join<Test, User> agentJoin = root.join("agent");
 						return builder.equal(agentJoin.get("id"), Long.parseLong(param.getValue().toString()));
@@ -72,7 +75,7 @@ public class TestService {
 
 	    Specification<Test> finalSpec = Specification.where(specs.get(0));
 	    for (int i = 1; i < specs.size(); i++) {
-	        finalSpec = finalSpec.or(specs.get(i));
+	        finalSpec = finalSpec.and(specs.get(i));
 	    }
 
 	    return repository.findAll(finalSpec);

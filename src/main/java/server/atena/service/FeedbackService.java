@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +30,10 @@ public class FeedbackService {
 	}
 
 	public List<Feedback> searchRates(List<SearchCriteria> params) {
-		Specification<Feedback> spec = Specification.where(null);
+    	List<Specification<Feedback>> specs = new ArrayList<>();
 
-		for (SearchCriteria param : params) {
-			spec = spec.and((root, query, builder) -> {
+	    for (SearchCriteria param : params) {
+	        Specification<Feedback> spec = (root, query, builder) -> {
 
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("dateRate".equals(param.getKey())) {
@@ -66,10 +65,16 @@ public class FeedbackService {
 				}
 
 				return null;
-			});
-		}
-		
-		return repository.findAll(spec, Sort.unsorted());
+	        };
+	        specs.add(spec);
+	    }
+
+	    Specification<Feedback> finalSpec = Specification.where(specs.get(0));
+	    for (int i = 1; i < specs.size(); i++) {
+	        finalSpec = finalSpec.and(specs.get(i));
+	    }
+
+	    return repository.findAll(finalSpec);
 	}
 
 	public void delete(Long e) {

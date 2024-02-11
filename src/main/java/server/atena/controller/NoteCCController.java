@@ -77,6 +77,12 @@ public class NoteCCController {
 		return ResponseEntity.ok(noteList);
 
 	}
+	
+	@GetMapping("/getById/{id}")
+	public ResponseEntity<NoteCC> getById(@PathVariable Long id) {
+		NoteCC noteCC = service.getById(id);
+		return ResponseEntity.ok(noteCC);
+	}
 
 	@PostMapping("/update")
 	public void update(@RequestBody String json_noteCC) throws JsonMappingException, JsonProcessingException {

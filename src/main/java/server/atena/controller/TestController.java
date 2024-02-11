@@ -86,6 +86,12 @@ public class TestController {
 		Iterable<Test> test = service.getAll();
 		return ResponseEntity.ok(test);
 	}
+	
+	@GetMapping("/getById/{id}")
+	public ResponseEntity<Test> getById(@PathVariable Long id) {
+		Test test = service.getById(id);
+		return ResponseEntity.ok(test);
+	}
 
 	@GetMapping("/getAllTestDates/{dateStart}/{dateEnd}")
 	public ResponseEntity<Iterable<Test>> getAllNoteDates(@PathVariable String dateStart,

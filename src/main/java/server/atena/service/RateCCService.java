@@ -4,31 +4,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.criteria.Join;
+import server.atena.app.enums.NotificationMode;
+import server.atena.app.enums.NotificationType;
 import server.atena.app.enums.TypeRateCC;
 import server.atena.models.NoteCC;
+import server.atena.models.Notification;
 import server.atena.models.Queue;
 import server.atena.models.RateCC;
 import server.atena.models.SearchCriteria;
 import server.atena.models.User;
+import server.atena.repositories.NotificationRepository;
 import server.atena.repositories.RateCCRepository;
 
 @Service
 public class RateCCService {
 
 	private final RateCCRepository repository;
+	private final NotificationRepository notiRepo;
 
 	@Autowired
-	public RateCCService(RateCCRepository repository) {
+	public RateCCService(RateCCRepository repository, NotificationRepository notiRepo) {
 		this.repository = repository;
+		this.notiRepo = notiRepo;
 	}
 
 	public RateCC add(RateCC rateCC) {
 		RateCC addedRateCC = repository.save(rateCC);
+		
+		// Dodanie powiadomienia o nowej ocenie
+		Notification noti = new Notification();
+		noti.setAgent(addedRateCC.getAgent());
+		noti.setMode(NotificationMode.PUSH_);
+		noti.setPreviewId(addedRateCC.getId());
+		
+		switch(addedRateCC.getTypeRate()) {
+
+		case ALL_:
+			break;
+		case CURRENT_:
+			noti.setText("Masz nową ocenę z bieżącego odsłuchu");
+			noti.setType(NotificationType.RATE_CC_C);
+			break;
+		case MYSTERY_:
+			noti.setText("Masz nową ocenę z tajemniczego klienta");
+			noti.setType(NotificationType.RATE_CC_M_);
+			break;
+		case RATTING_:
+			noti.setText("Masz nową ocenę z rozmowy");
+			noti.setType(NotificationType.RATE_CC_);
+			break;
+		default:
+			break;
+		}
+		
+		notiRepo.save(noti);
+
 		return addedRateCC;
 	}
 
@@ -37,11 +71,11 @@ public class RateCCService {
 	}
 
 	public List<RateCC> searchRates(List<SearchCriteria> params) {
-		Specification<RateCC> spec = Specification.where(null);
+    	List<Specification<RateCC>> specs = new ArrayList<>();
 
-		for (SearchCriteria param : params) {
-			spec = spec.and((root, query, builder) -> {
-
+	    for (SearchCriteria param : params) {
+	        Specification<RateCC> spec = (root, query, builder) -> {
+	        	
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("dateRate".equals(param.getKey())) {
 						String[] dateRange = param.getValue().toString().split(" AND ");
@@ -90,11 +124,17 @@ public class RateCCService {
 						return builder.equal(root.get(param.getKey()), param.getValue());
 					}
 				}
-				return null;
-			});
-		}
+	            return null;
+	        };
+	        specs.add(spec);
+	    }
 
-		return repository.findAll(spec, Sort.unsorted());
+	    Specification<RateCC> finalSpec = Specification.where(specs.get(0));
+	    for (int i = 1; i < specs.size(); i++) {
+	        finalSpec = finalSpec.and(specs.get(i));
+	    }
+
+	    return repository.findAll(finalSpec);
 	}
 
 	public List<RateCC> getAllRates() {

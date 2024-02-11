@@ -2,10 +2,11 @@ package server.atena.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 import jakarta.persistence.criteria.Join;
 import server.atena.models.NoteCC;
 import server.atena.models.RateM;
@@ -33,10 +34,10 @@ public class RateMService {
 	}
 
 	public List<RateM> searchRates(List<SearchCriteria> params) {
-		Specification<RateM> spec = Specification.where(null);
+    	List<Specification<RateM>> specs = new ArrayList<>();
 
-		for (SearchCriteria param : params) {
-			spec = spec.and((root, query, builder) -> {
+	    for (SearchCriteria param : params) {
+	        Specification<RateM> spec = (root, query, builder) -> {
 
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("dateRate".equals(param.getKey())) {
@@ -65,10 +66,16 @@ public class RateMService {
 				}
 
 				return null;
-			});
-		}
+	        };
+	        specs.add(spec);
+	    }
 
-		return repository.findAll(spec, Sort.unsorted());
+	    Specification<RateM> finalSpec = Specification.where(specs.get(0));
+	    for (int i = 1; i < specs.size(); i++) {
+	        finalSpec = finalSpec.and(specs.get(i));
+	    }
+
+	    return repository.findAll(finalSpec);
 	}
 
 	public List<RateM> getAllRates() {

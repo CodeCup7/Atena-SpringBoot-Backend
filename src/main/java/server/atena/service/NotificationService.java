@@ -3,7 +3,9 @@ package server.atena.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import server.atena.app.enums.Role;
 import server.atena.models.Notification;
+import server.atena.models.User;
 import server.atena.repositories.NotificationRepository;
 
 @Service
@@ -29,8 +31,15 @@ public class NotificationService {
 		return repository.findById(id).orElse(null);
 	}
 
-	public Iterable<Notification> getAll(Long id) {
-		return repository.getAllUserNotification(id);
+	public Iterable<Notification> getAll(User user) {
+		
+		if(user.getRole().equals(Role.Admin) || user.getRole().equals(Role.Trener)) {
+			return repository.getAllCoachNotification(user.getId());
+		} else {
+			return repository.getAllAgentNotification(user.getId());
+		}
+		
+		
 	}
 
 	public void update(Notification e) {

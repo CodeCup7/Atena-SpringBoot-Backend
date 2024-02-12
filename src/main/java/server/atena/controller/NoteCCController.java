@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,11 +43,6 @@ public class NoteCCController {
 		this.serviceRateCC = serviceRateCC;
 		this.serviceRateM = serviceRateM;
 	}
-	
-	@PostMapping("/search")
-    public List<NoteCC> searchNotes(@RequestBody List<SearchCriteria> params) {
-        return service.searchNotes(params);
-    }
 
 	@PostMapping("/add")
 	public ResponseEntity<NoteCC> add(@RequestBody String json_rateCC)
@@ -64,6 +60,15 @@ public class NoteCCController {
 		}
 	}
 
+	@PostMapping("/update")
+	public void update(@RequestBody String json_noteCC) throws JsonMappingException, JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		NoteCC noteCC = objectMapper.readValue(json_noteCC, NoteCC.class);
+
+		service.update(noteCC);
+		
+	}
+
 	@GetMapping("/getNoteAll")
 	public ResponseEntity<Iterable<NoteCC>> getAllNote() {
 		Iterable<NoteCC> noteList = service.getAllNote();
@@ -77,19 +82,16 @@ public class NoteCCController {
 		return ResponseEntity.ok(noteList);
 
 	}
-	
+
 	@GetMapping("/getById/{id}")
 	public ResponseEntity<NoteCC> getById(@PathVariable Long id) {
 		NoteCC noteCC = service.getById(id);
 		return ResponseEntity.ok(noteCC);
 	}
 
-	@PostMapping("/update")
-	public void update(@RequestBody String json_noteCC) throws JsonMappingException, JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		NoteCC noteCC = objectMapper.readValue(json_noteCC, NoteCC.class);
-
-		service.update(noteCC);
+	@PostMapping("/search")
+	public List<NoteCC> searchNotes(@RequestBody List<SearchCriteria> params) {
+		return service.searchNotes(params);
 	}
 
 	@DeleteMapping("/delete")
@@ -109,7 +111,7 @@ public class NoteCCController {
 			e.setNoteCC(null);
 			serviceRateCC.update(e);
 		});
-		
+
 		// Pobranie wszystkich RateM gdzie noteCC_id = id i ustawienie tych note_id na
 		// NULL (wyzerowanie ocen rateM względem noteCC - skasowanie relacji)
 		Iterable<RateM> rateMList = serviceRateM.getAllRateMByNoteId(noteCC);

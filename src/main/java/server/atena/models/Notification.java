@@ -20,6 +20,10 @@ public class Notification {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	@ManyToOne
+	@JoinColumn(name = "coach_id")
+	@JsonProperty("coach")
+	private User coach;
+	@ManyToOne
 	@JoinColumn(name = "agent_id")
 	@JsonProperty("agent")
 	private User agent;
@@ -36,6 +40,14 @@ public class Notification {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public User getCoach() {
+		return coach;
+	}
+
+	public void setCoach(User coach) {
+		this.coach = coach;
 	}
 
 	public User getAgent() {

@@ -8,11 +8,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.criteria.Join;
+import server.atena.app.enums.NotificationMode;
+import server.atena.app.enums.NotificationType;
 import server.atena.app.enums.StatusNote;
 import server.atena.models.NoteCC;
+import server.atena.models.Notification;
 import server.atena.models.SearchCriteria;
 import server.atena.models.User;
 import server.atena.repositories.NoteCCRepository;
+import server.atena.repositories.NotificationRepository;
 import server.atena.repositories.RateCCRepository;
 
 @Service
@@ -20,11 +24,37 @@ public class NoteCCService {
 
 	private final NoteCCRepository repository;
 	private final RateCCRepository repositoryRateCC;
+	private final NotificationRepository notiRepo;
 
 	@Autowired
-	public NoteCCService(NoteCCRepository repository, RateCCRepository repositoryRateCC) {
+	public NoteCCService(NoteCCRepository repository, RateCCRepository repositoryRateCC,
+			NotificationRepository notiRepo) {
 		this.repository = repository;
 		this.repositoryRateCC = repositoryRateCC;
+		this.notiRepo = notiRepo;
+	}
+
+	public NoteCC add(NoteCC noteCC) {
+		NoteCC addedNoteCC = repository.save(noteCC);
+
+		// Aktualizacja ocen wchodzących w skład coachingu
+		addedNoteCC.getRateCC_Col().forEach(rateCC -> {
+			rateCC.setNoteCC(noteCC);
+			repositoryRateCC.save(rateCC);
+		});
+
+		// Dodanie powiadomienia o nowej ocenie
+		Notification noti = new Notification();
+		noti.setAgent(addedNoteCC.getAgent());
+		noti.setMode(NotificationMode.PUSH_);
+		noti.setPreviewId(addedNoteCC.getId());
+		noti.setType(NotificationType.NOTE_CC_);
+		noti.setText("Masz dostęp do nowego coachingu");
+
+		notiRepo.save(noti);
+
+		return addedNoteCC;
+
 	}
 
 	public List<NoteCC> searchNotes(List<SearchCriteria> params) {
@@ -79,17 +109,6 @@ public class NoteCCService {
 		return repository.findAll(finalSpec);
 	}
 
-	public NoteCC add(NoteCC noteCC) {
-		NoteCC addedNoteCC = repository.save(noteCC);
-
-		addedNoteCC.getRateCC_Col().forEach(rateCC -> {
-			rateCC.setNoteCC(noteCC);
-			repositoryRateCC.save(rateCC);
-		});
-		return addedNoteCC;
-
-	}
-
 	public NoteCC getById(Long id) {
 		return repository.findById(id).orElse(null);
 	}
@@ -109,7 +128,21 @@ public class NoteCCService {
 	}
 
 	public void update(NoteCC noteCC) {
-		repository.save(noteCC);
+
+		NoteCC updateNoteCC = repository.save(noteCC);
+
+		if (noteCC.getStatus().equals(StatusNote.APPEAL_)) {
+
+			// Dodanie powiadomienia o odwołaniu
+			Notification noti = new Notification();
+			noti.setCoach(updateNoteCC.getCoach());
+			noti.setMode(NotificationMode.PUSH_);
+			noti.setPreviewId(updateNoteCC.getId());
+			noti.setType(NotificationType.NOTE_APPEALS_);
+			noti.setText("Nowe odwołanie agenta!");
+
+			notiRepo.save(noti);
+		}
 	}
 
 	public void deleteById(Long id) {

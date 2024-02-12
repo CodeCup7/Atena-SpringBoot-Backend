@@ -8,24 +8,41 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.criteria.Join;
+import server.atena.app.enums.NotificationMode;
+import server.atena.app.enums.NotificationType;
 import server.atena.models.NoteCC;
+import server.atena.models.Notification;
 import server.atena.models.RateM;
 import server.atena.models.SearchCriteria;
 import server.atena.models.User;
+import server.atena.repositories.NotificationRepository;
 import server.atena.repositories.RateMRepository;
 
 @Service
 public class RateMService {
 
 	private final RateMRepository repository;
+	private final NotificationRepository notiRepo;
 
 	@Autowired
-	public RateMService(RateMRepository repository) {
+	public RateMService(RateMRepository repository, NotificationRepository notiRepo) {
 		this.repository = repository;
+		this.notiRepo = notiRepo;
 	}
 
 	public RateM add(RateM RateM) {
 		RateM addedRateM = repository.save(RateM);
+		
+		// Dodanie powiadomienia o nowej ocenie
+		Notification noti = new Notification();
+		noti.setAgent(addedRateM.getAgent());
+		noti.setMode(NotificationMode.PUSH_);
+		noti.setPreviewId(addedRateM.getId());
+		noti.setType(NotificationType.RATE_M_);
+		noti.setText("Masz nową ocenę z karty maila");
+		
+		notiRepo.save(noti);
+		
 		return addedRateM;
 	}
 

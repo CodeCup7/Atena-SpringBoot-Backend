@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.Notification;
+import server.atena.models.User;
 import server.atena.service.NotificationService;
 									
 @RestController
@@ -62,9 +64,18 @@ public class NotificationController {
 		service.delete(id);
 	}
 	
-	@GetMapping("/getAll/{id}")
-	public ResponseEntity<Iterable<Notification>> getAll(@PathVariable Long id) {
-		Iterable<Notification> notification = service.getAll(id);
+	@PostMapping("/getAll")
+	public ResponseEntity<Iterable<Notification>> getAll(@RequestBody String json_user) {
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		User user = null;
+		try {
+			user = objectMapper.readValue(json_user, User.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		Iterable<Notification> notification = service.getAll(user);
 		return ResponseEntity.ok(notification);
 	}
 	

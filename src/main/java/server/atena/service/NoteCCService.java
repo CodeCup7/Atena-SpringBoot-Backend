@@ -18,19 +18,22 @@ import server.atena.models.User;
 import server.atena.repositories.NoteCCRepository;
 import server.atena.repositories.NotificationRepository;
 import server.atena.repositories.RateCCRepository;
+import server.atena.repositories.RateMRepository;
 
 @Service
 public class NoteCCService {
 
 	private final NoteCCRepository repository;
 	private final RateCCRepository repositoryRateCC;
+	private final RateMRepository repositoryRateM;
 	private final NotificationRepository notiRepo;
 
 	@Autowired
 	public NoteCCService(NoteCCRepository repository, RateCCRepository repositoryRateCC,
-			NotificationRepository notiRepo) {
+			RateMRepository repositoryRateM, NotificationRepository notiRepo) {
 		this.repository = repository;
 		this.repositoryRateCC = repositoryRateCC;
+		this.repositoryRateM = repositoryRateM;
 		this.notiRepo = notiRepo;
 	}
 
@@ -38,6 +41,10 @@ public class NoteCCService {
 		NoteCC addedNoteCC = repository.save(noteCC);
 
 		// Aktualizacja ocen wchodzących w skład coachingu
+		addedNoteCC.getRateM_Col().forEach(rateM -> {
+			rateM.setNoteCC(noteCC);
+			repositoryRateM.save(rateM);
+		});
 		addedNoteCC.getRateCC_Col().forEach(rateCC -> {
 			rateCC.setNoteCC(noteCC);
 			repositoryRateCC.save(rateCC);
@@ -90,6 +97,9 @@ public class NoteCCService {
 							return builder.equal(root.get(param.getKey()), param.getValue());
 						} else if (param.getValue().equals("CLOSE_WITHOUT_")) {
 							param.setValue(StatusNote.CLOSE_WITHOUT_);
+							return builder.equal(root.get(param.getKey()), param.getValue());
+						} else if (param.getValue().equals("APPEAL_")) {
+							param.setValue(StatusNote.APPEAL_);
 							return builder.equal(root.get(param.getKey()), param.getValue());
 						}
 					} else {

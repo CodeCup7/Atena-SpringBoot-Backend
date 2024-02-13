@@ -1,5 +1,6 @@
 package server.atena.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,6 +126,17 @@ public class RateMService {
 
 	public void update(RateM RateM) {
 		repository.save(RateM);
+	}
+	
+	public void updateList(List<RateM> list, BigInteger noteId) {
+		for(RateM rateM: list) {
+			repository.updateList(rateM.getId(), noteId);
+		}
+	}
+	public void deleteList(List<RateM> list) {
+		for(RateM rateM: list) {
+			repository.updateList(rateM.getId(), null);
+		}
 	}
 
 	public void deleteById(Long id) {

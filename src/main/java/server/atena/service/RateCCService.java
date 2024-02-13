@@ -109,6 +109,9 @@ public class RateCCService {
 					} else if ("coach".equals(param.getKey())) {
 						Join<RateCC, User> coachJoin = root.join("coach");
 						return builder.equal(coachJoin.get("id"), Long.parseLong(param.getValue().toString()));
+					} else if ("noteCC".equals(param.getKey())) {
+						Join<RateCC, NoteCC> noteCCJoin = root.join("noteCC");
+						return builder.equal(noteCCJoin.get("id"), Long.parseLong(param.getValue().toString()));
 					} else if ("typeRate".equals(param.getKey())) {
 						
 						if(param.getValue().equals("RATTING_")) {

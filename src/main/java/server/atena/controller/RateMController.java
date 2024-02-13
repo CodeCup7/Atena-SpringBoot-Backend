@@ -2,6 +2,7 @@ package server.atena.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.RateM;
@@ -92,7 +96,7 @@ public class RateMController {
 		return ResponseEntity.ok(rates);
 	}
 	
-	// Pobiera wszystkie RateCC które nie są przypisane do coachingu od wybranego agenta
+	// Pobiera wszystkie oceny agenta do modyfikcaji listy coachingowej
 	@GetMapping("/getAllRateNoNoteByAgent/{id}")
 	public ResponseEntity<Iterable<RateM>> getAllRateNoNoteByAgent(@PathVariable Long id) {
 		Iterable<RateM> rates = service.getAllRateNoNoteByAgent(id);
@@ -120,8 +124,6 @@ public class RateMController {
 		ObjectMapper objectMapper = new ObjectMapper();
 		RateM rateM = objectMapper.readValue(rateMJson, RateM.class);
 		
-		System.out.println(file);
-		
 		if(file != null) { // tylko gdy wraz z aktualizacją nastepuje podmiana pliku
 			
 			String fileName = String.valueOf(rateM.getId()) + "_" + file.getOriginalFilename();
@@ -131,14 +133,6 @@ public class RateMController {
 			String fileNameToDelete = String.valueOf(rateM.getAttachmentPath());
 			Path deletePath = Path.of(uploadDir).toAbsolutePath().normalize();
 			Path fileDeletePath = deletePath.resolve(fileNameToDelete);
-			
-			
-			
-			System.out.println("fileName" + fileName);
-			System.out.println("uploadPath" + uploadPath);
-			System.out.println("filePath" + filePath);
-			System.out.println("deletePath" + deletePath);
-			System.out.println("fileDeletePath" + fileDeletePath);
 			
 			// Usunięcie starego pliku !!!!!!!!!!!!!!!
 		    Files.delete(fileDeletePath);
@@ -154,6 +148,26 @@ public class RateMController {
 		}
 		
 		service.update(rateM);
+	}
+	
+	@PostMapping("/updateList/{noteId}")
+	public ResponseEntity<String> updateList(@RequestBody String json_rateCC, @PathVariable BigInteger noteId) throws JsonMappingException, JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<RateM> rateMList = objectMapper.readValue(json_rateCC, new TypeReference<List<RateM>>() {
+		});
+		
+		service.updateList(rateMList, noteId);
+		return new ResponseEntity<>("Lista została pomyślnie zaktualizowana.", HttpStatus.OK);
+	}
+	
+	@PostMapping("/deleteList")
+	public ResponseEntity<String> deleteList(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<RateM> rateMList = objectMapper.readValue(json_rateCC, new TypeReference<List<RateM>>() {
+		});
+		
+		service.deleteList(rateMList);
+		return new ResponseEntity<>("Lista została pomyślnie zaktualizowana.", HttpStatus.OK);
 	}
 
 	@DeleteMapping("/delete/{id}")

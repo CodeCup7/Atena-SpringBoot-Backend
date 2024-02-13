@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.SearchCriteria;
 import server.atena.service.RateCCService;
@@ -44,7 +43,6 @@ public class RateCCController {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 			final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
-
 			RateCC addedRateCC = service.add(rateCC);
 
 			return new ResponseEntity<>(addedRateCC, HttpStatus.OK);
@@ -71,8 +69,7 @@ public class RateCCController {
 		return ResponseEntity.ok(rates);
 	}
 
-	// Pobiera wszystkie RateCC które nie są przypisane do coachingu od wybranego
-	// agenta
+	// Pobiera wszystkie oceny agenta do modyfikcaji listy coachingowej
 	@GetMapping("/getAllRateNoNoteByAgent/{id}")
 	public ResponseEntity<Iterable<RateCC>> getAllRateNoNoteByAgent(@PathVariable Long id) {
 		Iterable<RateCC> rates = service.getAllRateNoNoteByAgent(id);

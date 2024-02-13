@@ -1,5 +1,6 @@
 package server.atena.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,6 +151,13 @@ public class RateCCService {
 		iterable.forEach(rateList::add);
 		return rateList;
 	}
+	
+	public List<RateCC> getAllRateNoNoteByAgent(long id) {
+		Iterable<RateCC> iterable = repository.getAllRateNoNoteByAgent(id);
+		List<RateCC> rateList = new ArrayList<>();
+		iterable.forEach(rateList::add);
+		return rateList;
+	}
 
 	public List<RateCC> getAllRateCCByNoteId(NoteCC noteCC) {
 		Iterable<RateCC> iterable = repository.getAllRateCCByNoteId(noteCC);
@@ -161,7 +169,17 @@ public class RateCCService {
 	public void update(RateCC rateCC) {
 		repository.save(rateCC);
 	}
-
+	public void updateList(List<RateCC> list, BigInteger noteId) {
+		for(RateCC rateCC: list) {
+			repository.updateList(rateCC.getId(), noteId);
+		}
+	}
+	public void deleteList(List<RateCC> list) {
+		for(RateCC rateCC: list) {
+			repository.updateList(rateCC.getId(), null);
+		}
+	}
+	
 	public void deleteById(Long id) {
 		repository.deleteById(id);
 	}

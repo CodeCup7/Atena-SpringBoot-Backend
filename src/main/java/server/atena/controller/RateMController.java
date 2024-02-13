@@ -91,6 +91,13 @@ public class RateMController {
 		Iterable<RateM> rates = service.getAllRateNoNote();
 		return ResponseEntity.ok(rates);
 	}
+	
+	// Pobiera wszystkie RateCC które nie są przypisane do coachingu od wybranego agenta
+	@GetMapping("/getAllRateNoNoteByAgent/{id}")
+	public ResponseEntity<Iterable<RateM>> getAllRateNoNoteByAgent(@PathVariable Long id) {
+		Iterable<RateM> rates = service.getAllRateNoNoteByAgent(id);
+		return ResponseEntity.ok(rates);
+	}
 
 	@GetMapping("/getById/{id}")
 	public ResponseEntity<RateM> getById(@PathVariable Long id) {

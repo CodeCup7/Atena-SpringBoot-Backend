@@ -108,6 +108,13 @@ public class RateMService {
 		iterable.forEach(rateList::add);
 		return rateList;
 	}
+	
+	public List<RateM> getAllRateNoNoteByAgent(long id) {
+		Iterable<RateM> iterable = repository.getAllRateNoNoteByAgent(id);
+		List<RateM> rateList = new ArrayList<>();
+		iterable.forEach(rateList::add);
+		return rateList;
+	}
 
 	public List<RateM> getAllRateMByNoteId(NoteCC noteCC) {
 		Iterable<RateM> iterable = repository.getAllRateMByNoteId(noteCC);

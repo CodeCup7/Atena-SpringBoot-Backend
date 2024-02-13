@@ -1,5 +1,6 @@
 package server.atena.controller;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.SearchCriteria;
 import server.atena.service.RateCCService;
@@ -35,26 +38,25 @@ public class RateCCController {
 	}
 
 	@PostMapping("/add")
-	public ResponseEntity<RateCC> add(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<RateCC> add(@RequestBody String json_rateCC)
+			throws JsonMappingException, JsonProcessingException {
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
 
-            RateCC addedRateCC = service.add(rateCC);
+			RateCC addedRateCC = service.add(rateCC);
 
-            return new ResponseEntity<>(addedRateCC, HttpStatus.OK);
-        } catch (JsonProcessingException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+			return new ResponseEntity<>(addedRateCC, HttpStatus.OK);
+		} catch (JsonProcessingException e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
-	
 
-	
 	@PostMapping("/search")
-    public List<RateCC> searchNotes(@RequestBody List<SearchCriteria> params) {
-        return service.searchRates(params);
-    }
+	public List<RateCC> searchNotes(@RequestBody List<SearchCriteria> params) {
+		return service.searchRates(params);
+	}
 
 	@GetMapping("/getAllRates")
 	public ResponseEntity<Iterable<RateCC>> getAllRates() {
@@ -68,15 +70,43 @@ public class RateCCController {
 		Iterable<RateCC> rates = service.getAllRateNoNote();
 		return ResponseEntity.ok(rates);
 	}
-	
+
+	// Pobiera wszystkie RateCC które nie są przypisane do coachingu od wybranego
+	// agenta
+	@GetMapping("/getAllRateNoNoteByAgent/{id}")
+	public ResponseEntity<Iterable<RateCC>> getAllRateNoNoteByAgent(@PathVariable Long id) {
+		Iterable<RateCC> rates = service.getAllRateNoNoteByAgent(id);
+		return ResponseEntity.ok(rates);
+	}
+
 	@GetMapping("/getById/{id}")
 	public ResponseEntity<RateCC> getById(@PathVariable Long id) {
 		RateCC rateCC = service.getById(id);
 		return ResponseEntity.ok(rateCC);
 	}
 
+	@PostMapping("/updateList/{noteId}")
+	public ResponseEntity<String> updateList(@RequestBody String json_rateCC, @PathVariable BigInteger noteId) throws JsonMappingException, JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<RateCC> rateCCList = objectMapper.readValue(json_rateCC, new TypeReference<List<RateCC>>() {
+		});
+		
+		service.updateList(rateCCList, noteId);
+		return new ResponseEntity<>("Lista została pomyślnie zaktualizowana.", HttpStatus.OK);
+	}
+	
+	@PostMapping("/deleteList")
+	public ResponseEntity<String> deleteList(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<RateCC> rateCCList = objectMapper.readValue(json_rateCC, new TypeReference<List<RateCC>>() {
+		});
+		
+		service.deleteList(rateCCList);
+		return new ResponseEntity<>("Lista została pomyślnie zaktualizowana.", HttpStatus.OK);
+	}
+
 	@PostMapping("/update")
-	public void update(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException  {
+	public void update(@RequestBody String json_rateCC) throws JsonMappingException, JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		final RateCC rateCC = objectMapper.readValue(json_rateCC, RateCC.class);
 

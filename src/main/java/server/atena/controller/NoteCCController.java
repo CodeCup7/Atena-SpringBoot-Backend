@@ -1,9 +1,15 @@
 package server.atena.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,6 +42,9 @@ public class NoteCCController {
 	private final RateCCService serviceRateCC;
 	private final RateMService serviceRateM;
 
+	@Value("${attachment.upload.dir}")
+	private String uploadDir;
+	
 	@Autowired
 	public NoteCCController(NoteCCService service, RateCCService serviceRateCC, RateMService serviceRateM) {
 		this.service = service;
@@ -120,6 +129,28 @@ public class NoteCCController {
 		});
 
 		service.deleteById(noteCC.getId());
+	}
+	
+	@PostMapping("/export")
+	public ResponseEntity<Resource> exportToFile(@RequestBody String json_noteCC) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			NoteCC noteCC = objectMapper.readValue(json_noteCC, NoteCC.class);
+
+			String fileName = String.valueOf(noteCC.getId());
+			Path filePath = Path.of(uploadDir).resolve(fileName + ".json"); // Dodaj ".json" do nazwy pliku
+
+			Files.writeString(filePath, json_noteCC); // Zapisz dane JSON do pliku
+
+			Resource resource = new UrlResource(filePath.toUri());
+
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+					.body(resource);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
 }

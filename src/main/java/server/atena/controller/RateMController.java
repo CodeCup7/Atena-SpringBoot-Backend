@@ -174,5 +174,27 @@ public class RateMController {
 	public void deleteById(@PathVariable Long id) {
 		service.deleteById(id);
 	}
+	
+	@PostMapping("/export")
+	public ResponseEntity<Resource> exportToFile(@RequestBody String json_rateM) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			RateM rateM = objectMapper.readValue(json_rateM, RateM.class);
+
+			String fileName = String.valueOf(rateM.getId());
+			Path filePath = Path.of(uploadDir).resolve(fileName + ".json"); // Dodaj ".json" do nazwy pliku
+
+			Files.writeString(filePath, json_rateM); // Zapisz dane JSON do pliku
+
+			Resource resource = new UrlResource(filePath.toUri());
+
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+					.body(resource);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
 
 }

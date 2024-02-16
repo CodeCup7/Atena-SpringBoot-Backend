@@ -33,7 +33,7 @@ public class RateMService {
 
 	public RateM add(RateM RateM) {
 		RateM addedRateM = repository.save(RateM);
-		
+
 		// Dodanie powiadomienia o nowej ocenie
 		Notification noti = new Notification();
 		noti.setAgent(addedRateM.getAgent());
@@ -41,9 +41,9 @@ public class RateMService {
 		noti.setPreviewId(addedRateM.getId());
 		noti.setType(NotificationType.RATE_M_);
 		noti.setText("Masz nową ocenę z karty maila");
-		
+
 		notiRepo.save(noti);
-		
+
 		return addedRateM;
 	}
 
@@ -52,10 +52,11 @@ public class RateMService {
 	}
 
 	public List<RateM> searchRates(List<SearchCriteria> params) {
-    	List<Specification<RateM>> specs = new ArrayList<>();
+		List<Specification<RateM>> ANDSpecs = new ArrayList<>();
+		List<Specification<RateM>> ORSpecs = new ArrayList<>();
 
-	    for (SearchCriteria param : params) {
-	        Specification<RateM> spec = (root, query, builder) -> {
+		for (SearchCriteria param : params) {
+			Specification<RateM> spec = (root, query, builder) -> {
 
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("dateRate".equals(param.getKey())) {
@@ -65,13 +66,13 @@ public class RateMService {
 						return builder.between(root.get(param.getKey()), startDate, endDate);
 					}
 				}
-				
+
 				if (param.getOperation().equalsIgnoreCase("LIKE")) {
 					return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
 				}
 
 				if (param.getOperation().equalsIgnoreCase(":")) {
-					
+
 					if ("agent".equals(param.getKey())) {
 						Join<RateM, User> agentJoin = root.join("agent");
 						return builder.equal(agentJoin.get("id"), Long.parseLong(param.getValue().toString()));
@@ -84,16 +85,33 @@ public class RateMService {
 				}
 
 				return null;
-	        };
-	        specs.add(spec);
-	    }
+			};
+			if ("agent".equals(param.getKey()) || "coach".equals(param.getKey())) {
+				ORSpecs.add(spec);
+			} else {
+				ANDSpecs.add(spec);
+			}
+		}
 
-	    Specification<RateM> finalSpec = Specification.where(specs.get(0));
-	    for (int i = 1; i < specs.size(); i++) {
-	        finalSpec = finalSpec.and(specs.get(i));
-	    }
+		Specification<RateM> finalANDSpec = ANDSpecs.isEmpty() ? null : ANDSpecs.get(0);
+		for (int i = 1; i < ANDSpecs.size(); i++) {
+			finalANDSpec = finalANDSpec.and(ANDSpecs.get(i));
+		}
 
-	    return repository.findAll(finalSpec);
+		Specification<RateM> finalORSpec = ORSpecs.isEmpty() ? null : ORSpecs.get(0);
+		for (int i = 1; i < ORSpecs.size(); i++) {
+			finalORSpec = finalORSpec.or(ORSpecs.get(i));
+		}
+
+		if (finalANDSpec != null && finalORSpec != null) {
+			return repository.findAll(finalANDSpec.and(finalORSpec));
+		} else if (finalANDSpec != null) {
+			return repository.findAll(finalANDSpec);
+		} else if (finalORSpec != null) {
+			return repository.findAll(finalORSpec);
+		} else {
+			return (List<RateM>) repository.findAll();
+		}
 	}
 
 	public List<RateM> getAllRates() {
@@ -109,7 +127,7 @@ public class RateMService {
 		iterable.forEach(rateList::add);
 		return rateList;
 	}
-	
+
 	public List<RateM> getAllRateNoNoteByAgent(long id) {
 		Iterable<RateM> iterable = repository.getAllRateNoNoteByAgent(id);
 		List<RateM> rateList = new ArrayList<>();
@@ -127,14 +145,15 @@ public class RateMService {
 	public void update(RateM RateM) {
 		repository.save(RateM);
 	}
-	
+
 	public void updateList(List<RateM> list, BigInteger noteId) {
-		for(RateM rateM: list) {
+		for (RateM rateM : list) {
 			repository.updateList(rateM.getId(), noteId);
 		}
 	}
+
 	public void deleteList(List<RateM> list) {
-		for(RateM rateM: list) {
+		for (RateM rateM : list) {
 			repository.updateList(rateM.getId(), null);
 		}
 	}

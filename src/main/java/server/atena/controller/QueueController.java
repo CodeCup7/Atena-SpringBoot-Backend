@@ -32,26 +32,21 @@ public class QueueController {
         this.service = service;
     }
     
-    @PostMapping("/add") // Zmieniamy na POST, bo to jest operacja zapisu
+    @PostMapping("/add") 
     public void add(@RequestBody String json_rateCC) {
         ObjectMapper objectMapper = new ObjectMapper();
         Queue queue = null;
         try {
         	queue = objectMapper.readValue(json_rateCC, Queue.class);
-            // Tutaj możesz przetwarzać obiekt RateCC
         } catch (IOException e) {
             e.printStackTrace();
-            // Obsłuż błąd deserializacji JSON
         }
     	
-        //rateCC. name = rateCC.get("name");
-        System.out.println(queue);
-       
         service.add(queue);
         
     }
     
-    @PostMapping("/addList") // Zmieniamy na POST, bo to jest operacja zapisu
+    @PostMapping("/addList") 
     public void addList(@RequestBody String json_rateCC) {
     	ObjectMapper objectMapper = new ObjectMapper();
 

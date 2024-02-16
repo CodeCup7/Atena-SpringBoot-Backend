@@ -72,74 +72,82 @@ public class RateCCService {
 	}
 
 	public List<RateCC> searchRates(List<SearchCriteria> params) {
-    	List<Specification<RateCC>> specs = new ArrayList<>();
+	    List<Specification<RateCC>> ANDSpecs = new ArrayList<>();
+	    List<Specification<RateCC>> ORSpecs = new ArrayList<>();
 
 	    for (SearchCriteria param : params) {
 	        Specification<RateCC> spec = (root, query, builder) -> {
-	        	
-				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
-					if ("dateRate".equals(param.getKey())) {
-						String[] dateRange = param.getValue().toString().split(" AND ");
-						String startDate = dateRange[0];
-						String endDate = dateRange[1];
-						return builder.between(root.get(param.getKey()), startDate, endDate);
-					}
+	            if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
+	                if ("dateRate".equals(param.getKey()) || "dateCall".equals(param.getKey())) {
+	                    String[] dateRange = param.getValue().toString().split(" AND ");
+	                    String startDate = dateRange[0];
+	                    String endDate = dateRange[1];
+	                    return builder.between(root.get(param.getKey()), startDate, endDate);
+	                }
+	            }
+	            
+	            if (param.getOperation().equalsIgnoreCase("LIKE")) {
+	                return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
+	            }
 
-					if ("dateCall".equals(param.getKey())) {
-						String[] dateRange = param.getValue().toString().split(" AND ");
-						String startDate = dateRange[0];
-						String endDate = dateRange[1];
-						return builder.between(root.get(param.getKey()), startDate, endDate);
-					}
-				}
-				
-				if (param.getOperation().equalsIgnoreCase("LIKE")) {
-					return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
-				}
-
-				if (param.getOperation().equalsIgnoreCase(":")) {
-					
-					if ("queue".equals(param.getKey())) {
-					    Join<RateCC, Queue> queueJoin = root.join("queue");
-					    return builder.equal(queueJoin.get("id"), Long.parseLong(param.getValue().toString()));
-					}
-					if ("agent".equals(param.getKey())) {
-						Join<RateCC, User> agentJoin = root.join("agent");
-						return builder.equal(agentJoin.get("id"), Long.parseLong(param.getValue().toString()));
-					} else if ("coach".equals(param.getKey())) {
-						Join<RateCC, User> coachJoin = root.join("coach");
-						return builder.equal(coachJoin.get("id"), Long.parseLong(param.getValue().toString()));
-					} else if ("noteCC".equals(param.getKey())) {
-						Join<RateCC, NoteCC> noteCCJoin = root.join("noteCC");
-						return builder.equal(noteCCJoin.get("id"), Long.parseLong(param.getValue().toString()));
-					} else if ("typeRate".equals(param.getKey())) {
-						
-						if(param.getValue().equals("RATTING_")) {
-							param.setValue(TypeRateCC.RATTING_);
-							return builder.equal(root.get(param.getKey()), param.getValue());
-						} else if (param.getValue().equals("CURRENT_")) {
-							param.setValue(TypeRateCC.CURRENT_);
-							return builder.equal(root.get(param.getKey()), param.getValue());
-						} else if (param.getValue().equals("MYSTERY_")) {
-							param.setValue(TypeRateCC.MYSTERY_);
-							return builder.equal(root.get(param.getKey()), param.getValue());
-						}
-					} else {
-						return builder.equal(root.get(param.getKey()), param.getValue());
-					}
-				}
+	            if (param.getOperation().equalsIgnoreCase(":")) {
+	                if ("queue".equals(param.getKey())) {
+	                    Join<RateCC, Queue> queueJoin = root.join("queue");
+	                    return builder.equal(queueJoin.get("id"), Long.parseLong(param.getValue().toString()));
+	                }
+	                if ("agent".equals(param.getKey()) || "coach".equals(param.getKey())) {
+	                    Join<RateCC, User> userJoin = root.join(param.getKey());
+	                    return builder.equal(userJoin.get("id"), Long.parseLong(param.getValue().toString()));
+	                } 
+	                if ("noteCC".equals(param.getKey())) {
+	                    Join<RateCC, NoteCC> noteCCJoin = root.join("noteCC");
+	                    return builder.equal(noteCCJoin.get("id"), Long.parseLong(param.getValue().toString()));
+	                } 
+	                if ("typeRate".equals(param.getKey())) {
+	                    if (param.getValue().equals("RATTING_")) {
+	                        param.setValue(TypeRateCC.RATTING_);
+	                        return builder.equal(root.get(param.getKey()), param.getValue());
+	                    } else if (param.getValue().equals("CURRENT_")) {
+	                        param.setValue(TypeRateCC.CURRENT_);
+	                        return builder.equal(root.get(param.getKey()), param.getValue());
+	                    } else if (param.getValue().equals("MYSTERY_")) {
+	                        param.setValue(TypeRateCC.MYSTERY_);
+	                        return builder.equal(root.get(param.getKey()), param.getValue());
+	                    }
+	                }
+	                return builder.equal(root.get(param.getKey()), param.getValue());
+	            }
 	            return null;
 	        };
-	        specs.add(spec);
+
+	        if ("agent".equals(param.getKey()) || "coach".equals(param.getKey())) {
+	            ORSpecs.add(spec);
+	        } else {
+	            ANDSpecs.add(spec);
+	        }
 	    }
 
-	    Specification<RateCC> finalSpec = Specification.where(specs.get(0));
-	    for (int i = 1; i < specs.size(); i++) {
-	        finalSpec = finalSpec.and(specs.get(i));
+	    Specification<RateCC> finalANDSpec = ANDSpecs.isEmpty() ? null : ANDSpecs.get(0);
+	    for (int i = 1; i < ANDSpecs.size(); i++) {
+	        finalANDSpec = finalANDSpec.and(ANDSpecs.get(i));
 	    }
 
-	    return repository.findAll(finalSpec);
+	    Specification<RateCC> finalORSpec = ORSpecs.isEmpty() ? null : ORSpecs.get(0);
+	    for (int i = 1; i < ORSpecs.size(); i++) {
+	        finalORSpec = finalORSpec.or(ORSpecs.get(i));
+	    }
+
+	    if (finalANDSpec != null && finalORSpec != null) {
+	        return repository.findAll(finalANDSpec.and(finalORSpec));
+	    } else if (finalANDSpec != null) {
+	        return repository.findAll(finalANDSpec);
+	    } else if (finalORSpec != null) {
+	        return repository.findAll(finalORSpec);
+	    } else {
+	        return (List<RateCC>) repository.findAll();
+	    }
 	}
+
 
 	public List<RateCC> getAllRates() {
 		Iterable<RateCC> iterable = repository.findAll();

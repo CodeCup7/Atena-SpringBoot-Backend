@@ -83,14 +83,6 @@ public class NoteCCController {
 		return ResponseEntity.ok(noteList);
 	}
 
-	@GetMapping("/getAllNoteBetweenDates/{dateStart}/{dateEnd}")
-	public ResponseEntity<Iterable<NoteCC>> getAllNoteDates(@PathVariable String dateStart,
-			@PathVariable String dateEnd) {
-		Iterable<NoteCC> noteList = service.getAllNoteDates(dateStart, dateEnd);
-		return ResponseEntity.ok(noteList);
-
-	}
-
 	@GetMapping("/getById/{id}")
 	public ResponseEntity<NoteCC> getById(@PathVariable Long id) {
 		NoteCC noteCC = service.getById(id);

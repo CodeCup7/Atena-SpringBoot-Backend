@@ -30,10 +30,11 @@ public class FeedbackService {
 	}
 
 	public List<Feedback> searchRates(List<SearchCriteria> params) {
-    	List<Specification<Feedback>> specs = new ArrayList<>();
+		List<Specification<Feedback>> ANDSpecs = new ArrayList<>();
+		List<Specification<Feedback>> ORSpecs = new ArrayList<>();
 
-	    for (SearchCriteria param : params) {
-	        Specification<Feedback> spec = (root, query, builder) -> {
+		for (SearchCriteria param : params) {
+			Specification<Feedback> spec = (root, query, builder) -> {
 
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("dateRate".equals(param.getKey())) {
@@ -52,7 +53,7 @@ public class FeedbackService {
 						Join<Feedback, User> agentJoin = root.join("agent");
 						return builder.equal(agentJoin.get("id"), Long.parseLong(param.getValue().toString()));
 					} else if ("testPass".equals(param.getKey())) {
-						if(param.getValue().equals("POSITIVE_")) {
+						if (param.getValue().equals("POSITIVE_")) {
 							param.setValue(FeedbackType.POSITIVE_);
 							return builder.equal(root.get(param.getKey()), param.getValue());
 						} else if (param.getValue().equals("NEGATIVE_")) {
@@ -65,16 +66,34 @@ public class FeedbackService {
 				}
 
 				return null;
-	        };
-	        specs.add(spec);
-	    }
+			};
+			if ("agent".equals(param.getKey()) || "coach".equals(param.getKey())) {
+				ORSpecs.add(spec);
+			} else {
+				ANDSpecs.add(spec);
+			}
+		}
 
-	    Specification<Feedback> finalSpec = Specification.where(specs.get(0));
-	    for (int i = 1; i < specs.size(); i++) {
-	        finalSpec = finalSpec.and(specs.get(i));
-	    }
+		Specification<Feedback> finalANDSpec = ANDSpecs.isEmpty() ? null : ANDSpecs.get(0);
+		for (int i = 1; i < ANDSpecs.size(); i++) {
+			finalANDSpec = finalANDSpec.and(ANDSpecs.get(i));
+		}
 
-	    return repository.findAll(finalSpec);
+		Specification<Feedback> finalORSpec = ORSpecs.isEmpty() ? null : ORSpecs.get(0);
+		for (int i = 1; i < ORSpecs.size(); i++) {
+			finalORSpec = finalORSpec.or(ORSpecs.get(i));
+		}
+
+		if (finalANDSpec != null && finalORSpec != null) {
+			return repository.findAll(finalANDSpec.and(finalORSpec));
+		} else if (finalANDSpec != null) {
+			return repository.findAll(finalANDSpec);
+		} else if (finalORSpec != null) {
+			return repository.findAll(finalORSpec);
+		} else {
+			return (List<Feedback>) repository.findAll();
+		}
+
 	}
 
 	public void delete(Long e) {

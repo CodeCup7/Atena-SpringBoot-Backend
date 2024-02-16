@@ -16,24 +16,25 @@ import server.atena.repositories.TestRepository;
 
 @Service
 public class TestService {
-	
-    private final TestRepository repository;
 
-    @Autowired
-    public TestService(TestRepository repository) {
-        this.repository = repository;
-    }
-    
-    public Test add(Test test) {
-    	Test addedTest= repository.save(test);
+	private final TestRepository repository;
+
+	@Autowired
+	public TestService(TestRepository repository) {
+		this.repository = repository;
+	}
+
+	public Test add(Test test) {
+		Test addedTest = repository.save(test);
 		return addedTest;
-    }
-    
-    public List<Test> searchRates(List<SearchCriteria> params) {
-    	List<Specification<Test>> specs = new ArrayList<>();
+	}
 
-	    for (SearchCriteria param : params) {
-	        Specification<Test> spec = (root, query, builder) -> {
+	public List<Test> searchRates(List<SearchCriteria> params) {
+		List<Specification<Test>> ANDSpecs = new ArrayList<>();
+		List<Specification<Test>> ORSpecs = new ArrayList<>();
+
+		for (SearchCriteria param : params) {
+			Specification<Test> spec = (root, query, builder) -> {
 
 				if (param.getOperation().equalsIgnoreCase("BETWEEN")) {
 					if ("dateTest".equals(param.getKey())) {
@@ -43,18 +44,18 @@ public class TestService {
 						return builder.between(root.get(param.getKey()), startDate, endDate);
 					}
 				}
-				
+
 				if (param.getOperation().equalsIgnoreCase("LIKE")) {
 					return builder.like(root.get(param.getKey()), "%" + param.getValue() + "%");
 				}
-				
+
 				if (param.getOperation().equalsIgnoreCase(":")) {
-					
+
 					if ("agent".equals(param.getKey())) {
 						Join<Test, User> agentJoin = root.join("agent");
 						return builder.equal(agentJoin.get("id"), Long.parseLong(param.getValue().toString()));
 					} else if ("testPass".equals(param.getKey())) {
-						if(param.getValue().equals("NO_PASS_")) {
+						if (param.getValue().equals("NO_PASS_")) {
 							param.setValue(TestPass.NO_PASS_);
 							return builder.equal(root.get(param.getKey()), param.getValue());
 						} else if (param.getValue().equals("NO_REQUIRED_")) {
@@ -68,36 +69,53 @@ public class TestService {
 						return builder.equal(root.get(param.getKey()), param.getValue());
 					}
 				}
-	            return null;
-	        };
-	        specs.add(spec);
-	    }
+				return null;
+			};
+			if ("agent".equals(param.getKey()) || "coach".equals(param.getKey())) {
+				ORSpecs.add(spec);
+			} else {
+				ANDSpecs.add(spec);
+			}
+		}
 
-	    Specification<Test> finalSpec = Specification.where(specs.get(0));
-	    for (int i = 1; i < specs.size(); i++) {
-	        finalSpec = finalSpec.and(specs.get(i));
-	    }
+		Specification<Test> finalANDSpec = ANDSpecs.isEmpty() ? null : ANDSpecs.get(0);
+		for (int i = 1; i < ANDSpecs.size(); i++) {
+			finalANDSpec = finalANDSpec.and(ANDSpecs.get(i));
+		}
 
-	    return repository.findAll(finalSpec);
+		Specification<Test> finalORSpec = ORSpecs.isEmpty() ? null : ORSpecs.get(0);
+		for (int i = 1; i < ORSpecs.size(); i++) {
+			finalORSpec = finalORSpec.or(ORSpecs.get(i));
+		}
+
+		if (finalANDSpec != null && finalORSpec != null) {
+			return repository.findAll(finalANDSpec.and(finalORSpec));
+		} else if (finalANDSpec != null) {
+			return repository.findAll(finalANDSpec);
+		} else if (finalORSpec != null) {
+			return repository.findAll(finalORSpec);
+		} else {
+			return (List<Test>) repository.findAll();
+		}
+
 	}
-    	
-    public void delete(Long e) {
-        repository.deleteById(e);
-    }
-    
-    public Test getById(Long id) {
-        return repository.findById(id).orElse(null);
-    }
-    
 
-    public Iterable<Test> getAll() {
-        return repository.findAll();
-    }
-    
-    public void update(Test e) {
-        repository.save(e);
-    }
-    
+	public void delete(Long e) {
+		repository.deleteById(e);
+	}
+
+	public Test getById(Long id) {
+		return repository.findById(id).orElse(null);
+	}
+
+	public Iterable<Test> getAll() {
+		return repository.findAll();
+	}
+
+	public void update(Test e) {
+		repository.save(e);
+	}
+
 	public List<Test> getAllNoteDates(String startDate, String endDate) {
 		Iterable<Test> iterable = repository.getAllTestsDates(startDate, endDate);
 		List<Test> testList = new ArrayList<>();

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.models.Feedback;
@@ -49,6 +50,23 @@ public class FeedbackController {
 		return new ResponseEntity<>(addedFeedback, HttpStatus.OK);
      
     }
+    
+	@PostMapping("/addList")
+	public void addList(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			List<Feedback> myObjectList = objectMapper.readValue(json_rateCC, new TypeReference<List<Feedback>>() {
+			});
+
+			for (Feedback feedback : myObjectList) {
+				service.add(feedback);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
     
 	@PostMapping("/search")
 	public List<Feedback> searchNotes(@RequestBody List<SearchCriteria> params) {

@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import server.atena.models.Feedback;
 import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.RateM;
@@ -66,6 +68,23 @@ public class NoteCCController {
 		} catch (JsonProcessingException e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@PostMapping("/addList")
+	public void addList(@RequestBody String json_rateCC) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			List<NoteCC> myObjectList = objectMapper.readValue(json_rateCC, new TypeReference<List<NoteCC>>() {
+			});
+
+			for (NoteCC noteCC : myObjectList) {
+				service.add(noteCC);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@PostMapping("/update")

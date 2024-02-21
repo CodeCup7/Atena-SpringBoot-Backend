@@ -33,6 +33,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import server.atena.models.RateCC;
 import server.atena.models.RateM;
 import server.atena.models.SearchCriteria;
 import server.atena.service.RateMService;
@@ -76,6 +77,23 @@ public class RateMController {
 		service.update(addedRateM);
 
 		return new ResponseEntity<>(addedRateM, HttpStatus.OK);
+	}
+	
+	@PostMapping("/addList")
+	public void addList(@RequestBody String json_rateM) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			List<RateM> myObjectList = objectMapper.readValue(json_rateM, new TypeReference<List<RateM>>() {
+			});
+
+			for (RateM rateM : myObjectList) {
+				service.add(rateM);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@PostMapping("/search")

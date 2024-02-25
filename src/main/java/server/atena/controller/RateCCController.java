@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import server.atena.app.enums.TypeRateCC;
 import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.SearchCriteria;
@@ -164,6 +165,21 @@ public class RateCCController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+	
+	@DeleteMapping("/deleteMysteryAndCurrent")
+	public ResponseEntity<Resource> deleteMysteryAndCurrent() {
+
+			Iterable<RateCC> rates = service.getAllRates();
+			rates.forEach(e->{
+				
+				if(e.getTypeRate().equals(TypeRateCC.CURRENT_) || e.getTypeRate().equals(TypeRateCC.MYSTERY_)) {
+					deleteById(e.getId());
+				}
+				
+			});
+
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 }

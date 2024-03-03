@@ -90,7 +90,6 @@ public class UserController {
 
 	@GetMapping("/getUserAll")
 	public ResponseEntity<Iterable<User>> getAllUsers() {
-		System.out.println("Pytam serwer");
 		Iterable<User> users = service.getAllUsers();
 		return ResponseEntity.ok(users);
 	}

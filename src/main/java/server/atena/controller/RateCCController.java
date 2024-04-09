@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.atena.app.enums.TypeRateCC;
-import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.SearchCriteria;
 import server.atena.service.RateCCService;

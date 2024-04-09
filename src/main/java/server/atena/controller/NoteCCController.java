@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import server.atena.models.Feedback;
 import server.atena.models.NoteCC;
 import server.atena.models.RateCC;
 import server.atena.models.RateM;
